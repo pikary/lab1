@@ -1,9 +1,8 @@
 exports.handler = async (event) => {
-    const { httpMethod, resource } = event;
-    console.log(event);
-    
+    const { httpMethod, path } = event;
+
     // Handle the /hello GET request
-    if (resource === '/hello') {
+    if (httpMethod === 'GET' && path === '/hello') {
         return {
             statusCode: 200,
             body: JSON.stringify({
@@ -18,7 +17,7 @@ exports.handler = async (event) => {
         statusCode: 400,
         body: JSON.stringify({
             statusCode: 400,
-            message: `Bad request syntax or unsupported method. Request path: ${resource}. HTTP method: ${httpMethod}`
+            message: `Bad request syntax or unsupported method. Request path: ${path}. HTTP method: ${httpMethod}`
         })
     };
 };
