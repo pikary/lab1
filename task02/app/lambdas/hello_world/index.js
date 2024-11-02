@@ -1,8 +1,9 @@
 exports.handler = async (event) => {
-    const { httpMethod, path } = event;
-
+    const { httpMethod, resource } = event;
+    console.log(event);
+    
     // Handle the /hello GET request
-    if (httpMethod === 'GET' && path === '/hello') {
+    if (resource === '/hello') {
         return {
             statusCode: 200,
             body: JSON.stringify({
