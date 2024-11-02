@@ -5,7 +5,11 @@ exports.handler = async (event) => {
     // Handle the /hello GET request
     console.log(event);
     
-    if (event.resource === '/hello') {
+    console.log('HELLOOO');
+    
+    if (event.rawPath == '/hello') {
+        console.log('HELLO THIS IS HELLO ROUTE');
+        
         return {
             statusCode: 200,
             headers: {
@@ -21,6 +25,6 @@ exports.handler = async (event) => {
         headers: {
             "Content-Type": "application/json"
         },
-        message: `Bad request syntax or unsupported method. Request path: ${event.resource}. HTTP method: ${method}`
+        message: `Bad request syntax or unsupported method. Request path: ${event.rawPath}. HTTP method: ${event.requestContext.http.method}`
     }
 };
