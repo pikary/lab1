@@ -25,7 +25,7 @@
     "resource_type": "iam_policy",
     "tags": {}
   },
-  "task3_api": {
+  "task3_api-test": {
     "resource_type": "api_gateway",
     "deploy_stage": "api",
     "dependencies": [],
@@ -39,7 +39,8 @@
           "integration_request_body_template": {},
           "responses": [],
           "integration_responses": [],
-          "default_error_pattern": true
+          "default_error_pattern": true,
+          "lambda_name":"hello_world"
         }
       }
     },
