@@ -11,8 +11,9 @@
   "dependencies": [],
   "event_sources": [
     {
-      "resource_name": "lambda_topic",
-      "resource_type": "sns_topic"
+      "target_topic":"lambda_topic",
+      "resource_type":"sns_topic_trigger",
+      "region": "eu-central-1"
     }
   ],
   "env_variables": {},
