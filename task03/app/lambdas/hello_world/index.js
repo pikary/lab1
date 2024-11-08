@@ -1,7 +1,6 @@
 exports.handler = async (event) => {
     // TODO implement
     return {
-        statusCode: 200,
         headers: {
             "Content-Type": "application/json"
         },
