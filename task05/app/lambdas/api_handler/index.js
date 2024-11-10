@@ -7,7 +7,7 @@ const { v4: uuidv4 } = require("uuid");
 
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
-const tableName = "Events";
+const tableName = "cmtr-77278c6b-Events";
 
 exports.handler = async (event, context) => {
     let body;
