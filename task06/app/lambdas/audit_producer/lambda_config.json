@@ -12,7 +12,7 @@
   "event_sources": [
     {
       "resource_type": "dynamodb_trigger",
-      "target_queue": "Configuration",
+      "target_table": "Configuration",
       "batch_size":10
     }
   ],
