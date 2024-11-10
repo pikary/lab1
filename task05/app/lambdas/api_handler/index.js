@@ -15,14 +15,15 @@ exports.handler = async (event, context) => {
     const headers = {
         "Content-Type": "application/json",
     };
-
+    // console.log(event);
+    
     try {
-        const requestJSON = JSON.parse(event.body);
+        // const requestJSON = JSON.parse(event.input.body);
         const newEvent = {
             id: uuidv4(),
-            principalId: requestJSON.principalId,
+            principalId: event.principalId,
             createdAt: new Date().toISOString(),
-            body: JSON.parse(requestJSON.content),
+            body: JSON.parse(event.content),
         };
 
         await dynamo.send(
@@ -40,6 +41,8 @@ exports.handler = async (event, context) => {
     } catch (err) {
         statusCode = 400;
         body = { error: err.message };
+        console.log(err);
+        
     }
 
     return {
