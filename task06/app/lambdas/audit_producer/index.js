@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk');
 const uuid = require('uuid');
 const dynamodb = new AWS.DynamoDB.DocumentClient();
-const AUDIT_TABLE = "Audit-test";
+const AUDIT_TABLE = "Audit";
 
 exports.handler = async (event) => {
     for (const record of event.Records) {
