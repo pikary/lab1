@@ -9,6 +9,13 @@
   "timeout": 100,
   "lambda_path": "lambdas\\audit_producer",
   "env_variables": {},
+  "event_sources": [
+    {
+      "resource_type": "dynamodb_trigger",
+      "target_queue": "Configuration",
+      "batch_size":10
+    }
+  ],
   "publish_version": true,
   "alias": "learn",
   "url_config": {},
