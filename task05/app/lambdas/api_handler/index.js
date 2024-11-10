@@ -15,7 +15,7 @@ exports.handler = async (event, context) => {
     const headers = {
         "Content-Type": "application/json",
     };
-    // console.log(event);
+    console.log(event);
     
     try {
         // const requestJSON = JSON.parse(event.input.body);
@@ -34,20 +34,20 @@ exports.handler = async (event, context) => {
         );
 
         statusCode = 201;
-        body = {
-            statusCode: 201,
-            event: newEvent,
+
+        return {
+            statusCode,
+            event:newEvent,
         };
     } catch (err) {
         statusCode = 400;
         body = { error: err.message };
         console.log(err);
-        
+        return {
+            statusCode,
+            body
+        };
     }
 
-    return {
-        statusCode,
-        body: JSON.stringify(body),
-        headers,
-    };
+    
 };
