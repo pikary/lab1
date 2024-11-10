@@ -11,13 +11,13 @@
   "dependencies": [
     {
       "resource_type":"dynamodb_table",
-      "resource_name":"Configuration"
+      "resource_name":"cmtr-77278c6b-Configuration"
     }
   ],
   "event_sources": [
     {
       "resource_type": "dynamodb_trigger",
-      "target_table": "Configuration",
+      "target_table": "cmtr-77278c6b-Configuration",
       "batch_size": 123
     }
   ],
