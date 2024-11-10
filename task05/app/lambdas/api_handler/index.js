@@ -16,38 +16,30 @@ exports.handler = async (event, context) => {
         "Content-Type": "application/json",
     };
     console.log(event);
-    
-    try {
-        // const requestJSON = JSON.parse(event.input.body);
-        const newEvent = {
-            id: uuidv4(),
-            principalId: event.principalId,
-            createdAt: new Date().toISOString(),
-            body: event.content,
-        };
 
-        await dynamo.send(
-            new PutCommand({
-                TableName: tableName,
-                Item: newEvent,
-            })
-        );
 
-        statusCode = 201;
+    // const requestJSON = JSON.parse(event.input.body);
+    const newEvent = {
+        id: uuidv4(),
+        principalId: event.principalId,
+        createdAt: new Date().toISOString(),
+        body: event.content,
+    };
 
-        return {
-            statusCode,
-            event:newEvent,
-        };
-    } catch (err) {
-        statusCode = 400;
-        body = { error: err.message };
-        console.log(err);
-        return {
-            statusCode,
-            body
-        };
-    }
+    await dynamo.send(
+        new PutCommand({
+            TableName: tableName,
+            Item: newEvent,
+        })
+    );
 
-    
+    statusCode = 201;
+
+    return {
+        statusCode,
+        event: newEvent,
+    };
+
+
+
 };
