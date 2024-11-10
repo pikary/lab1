@@ -23,7 +23,7 @@ exports.handler = async (event, context) => {
             id: uuidv4(),
             principalId: event.principalId,
             createdAt: new Date().toISOString(),
-            body: JSON.parse(event.content),
+            body: event.content,
         };
 
         await dynamo.send(
