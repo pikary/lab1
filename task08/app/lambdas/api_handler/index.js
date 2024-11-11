@@ -1,15 +1,18 @@
-const axios = require('axios')
+const WeatherService = require('../layers/weatherapi/index'); // Adjust the path as needed
+
 
 exports.handler = async (event) => {
     try {
-        const response = await axios.get('https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m', {
-        });
+        const weatherService = new WeatherService();
+
+        const { latitude = 52.52, longitude = 13.405 } = event.queryStringParameters || {}
+        const forecast = await weatherService.getWeatherForecast(latitude, longitude);
         return {
             headers: {
                 "Content-Type": "application/json"
             },
             statusCode: 200,
-            body: JSON.stringify(response),
+            body: JSON.stringify(forecast),
         };
     } catch (error) {
         console.log(error);
