@@ -1,22 +1,24 @@
-const WeatherService = require('./WeatherService'); // Assuming the class is in a separate file
+const axios = require('axios')
 
 exports.handler = async (event) => {
-    const weatherService = new WeatherService();
-
-    // Extract latitude and longitude from the event object or use defaults
-    const { latitude = 52.52, longitude = 13.405 } = event.queryStringParameters || {};
-
     try {
-        const forecast = await weatherService.getWeatherForecast(latitude, longitude);
-
+        const response = await axios.get('https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m', {
+            params: {
+                latitude: latitude,
+                longitude: longitude,
+                hourly: 'temperature_2m',
+            },
+        });
         return {
             headers: {
                 "Content-Type": "application/json"
             },
             statusCode: 200,
-            body: JSON.stringify(forecast),
+            body: JSON.stringify(response),
         };
     } catch (error) {
+        console.log(error);
+        
         return {
             headers: {
                 "Content-Type": "application/json"
