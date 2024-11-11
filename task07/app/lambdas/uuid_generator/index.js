@@ -1,6 +1,9 @@
 const { v4: uuidv4 } = require("uuid");
+const AWS = require("aws-sdk")
+
 
 exports.handler = async (event) => {
+    
     const ids = []
     for (let i = 0; i < 10; i++) {
         ids.push(uuidv4())
@@ -16,7 +19,7 @@ exports.handler = async (event) => {
         uuids: ids
     });
     const params = {
-        Bucket: 'uuid-storage',
+        Bucket: process.env.target_bucket,
         Key: fileName,
         Body: fileContent,
         ContentType: "application/json"
