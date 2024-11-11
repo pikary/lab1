@@ -36,6 +36,13 @@ exports.handler = async (event, context) => {
     statusCode = 201;
 
     return {
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            statusCode,
+            event: newEvent,
+        }),
         statusCode,
         event: newEvent,
     };
