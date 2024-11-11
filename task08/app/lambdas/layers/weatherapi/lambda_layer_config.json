@@ -1,0 +1,8 @@
+{
+  "name": "weatherapi",
+  "resource_type": "lambda_layer",
+  "runtimes": [
+    "nodejs20.x"
+  ],
+  "deployment_package": "weatherapi_layer.zip"
+}

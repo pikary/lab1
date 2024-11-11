@@ -3,11 +3,6 @@ const axios = require('axios')
 exports.handler = async (event) => {
     try {
         const response = await axios.get('https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m', {
-            params: {
-                latitude: latitude,
-                longitude: longitude,
-                hourly: 'temperature_2m',
-            },
         });
         return {
             headers: {
@@ -18,7 +13,7 @@ exports.handler = async (event) => {
         };
     } catch (error) {
         console.log(error);
-        
+
         return {
             headers: {
                 "Content-Type": "application/json"
