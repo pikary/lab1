@@ -12,6 +12,7 @@
             "dynamodb:PutItem",
             "dynamodb:Batch*",
             "dynamodb:DeleteItem",
+            "s3:PutObject",
             "ssm:PutParameter",
             "ssm:GetParameter",
             "kms:Decrypt"
@@ -24,6 +25,22 @@
     },
     "resource_type": "iam_policy",
     "tags": {}
+  },
+  "PutObjectToS3Policy": {
+    "resource_type": "iam_policy",
+    "policy_content": {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Action": [
+            "s3:PutObject",
+            "s3:PutObjectAcl"
+          ],
+          "Resource": "*",
+          "Effect": "Allow"
+        }
+      ]
+    }
   },
   "uuid-storage": {
     "resource_type": "s3_bucket",
