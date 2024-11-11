@@ -10,8 +10,7 @@ exports.handler = async (event) => {
         
         const s3 = new AWS.S3();
         const timestamp = new Date().toISOString();
-        const fileName = `uuids-${timestamp}.json`;
-
+        const fileName = `${timestamp}`; 
         // Prepare file content
         const fileContent = JSON.stringify({
             generatedAt: timestamp,
