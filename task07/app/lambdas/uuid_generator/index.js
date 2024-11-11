@@ -13,7 +13,7 @@ exports.handler = async (event) => {
         const fileName = `${timestamp}`; 
         // Prepare file content
         const fileContent = JSON.stringify({
-            ids
+            ids:ids
         });
 
         const params = {
