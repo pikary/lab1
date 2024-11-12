@@ -1,5 +1,5 @@
 {
-  "name": "weatherapi",
+  "name": "weatherapi_layer",
   "resource_type": "lambda_layer",
   "runtimes": [
     "nodejs20.x"
