@@ -1,29 +1,15 @@
-const WeatherService = require('weatherservice'); // Adjust the path as needed
-// const WeatherService = require('/var/task/lambdas/api_handler/index.js'); 
+const moment = require('moment')
+const WeatherAPI = require('nurlan')
 
 exports.handler = async (event) => {
-    try {
-        console.log(WeatherService);
+    try{
+        const weatherApiInstance = new WeatherAPI()
+        const result =await weatherApiInstance.getWeather()
+        return {
+            body: JSON.stringify(result)
+        }
+    }catch(e){
+        console.log(e);
         
-        const weatherService = new WeatherService();
-     
-        const forecast = await weatherService.getWeatherForecast();
-        return {
-            headers: {
-                "Content-Type": "application/json"
-            },
-            statusCode: 200,
-            body: JSON.stringify(forecast),
-        };
-    } catch (error) {
-        console.log(error);
-
-        return {
-            headers: {
-                "Content-Type": "application/json"
-            },
-            statusCode: 500,
-            body: JSON.stringify({ error: error.message }),
-        };
     }
 };

@@ -1,0 +1,8 @@
+{
+  "name": "weather-service",
+  "resource_type": "lambda_layer",
+  "runtimes": [
+    "nodejs20.x"
+  ],
+  "deployment_package": "weather-service_layer.zip"
+}
