@@ -30,6 +30,7 @@
       "resource_name": "${booking_userpool}",
       "resource_type": "cognito_idp",
       "parameter": "client_id"
-    }
+    },
+    "region":"${region}"
   }
 }
