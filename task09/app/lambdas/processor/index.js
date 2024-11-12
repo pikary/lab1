@@ -9,9 +9,26 @@ exports.handler = async (event) => {
     // TODO implement
     try {
         const result = await axios.get('https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m')
+        const filteredData = {
+            elevation: result.data.elevation,
+            generationtime_ms: result.data.generationtime_ms,
+            hourly: {
+                temperature_2m: result.data.hourly.temperature_2m,
+                time: result.data.hourly.time,
+            },
+            hourly_units: {
+                temperature_2m: result.data.hourly_units.temperature_2m,
+                time: result.data.hourly_units.time,
+            },
+            latitude: result.data.latitude,
+            longitude: result.data.longitude,
+            timezone: result.data.timezone,
+            timezone_abbreviation: result.data.timezone_abbreviation,
+            utc_offset_seconds: result.data.utc_offset_seconds
+        };
         const newEntity = {
             id: uuid.v4(),
-            forecast: result.data
+            forecast: filteredData
         }
 
         const params = {
