@@ -19,7 +19,6 @@
     "ephemeral_storage": 512,
     "tags": {},
     "layers": [
-        "custom_layer",
-        "weatherapi_layer"
+        "custom_layer"
     ]
 }
