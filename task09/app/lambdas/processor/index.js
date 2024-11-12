@@ -11,7 +11,7 @@ exports.handler = async (event) => {
         const result = await axios.get('https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m')
         const newEntity = {
             id: uuid.v4(),
-            forecase: result
+            forecase: result.data
         }
 
         const params = {
@@ -26,18 +26,18 @@ exports.handler = async (event) => {
                 "Content-type": "application/json"
             },
             statusCode: 200,
-            body: result
+            body: newEntity
         };
         return JSON.stringify(response);
     } catch (e) {
-        console.error('Error:', error);
+        console.error('Error:', e);
 
         return {
             headers: {
                 "Content-Type": "application/json"
             },
             statusCode: 500,
-            body: JSON.stringify({ message: 'Failed to fetch data or save to DynamoDB', error: error.message }),
+            body: JSON.stringify({ message: 'Failed to fetch data or save to DynamoDB', error: e.message }),
         };
     }
 
