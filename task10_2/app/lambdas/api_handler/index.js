@@ -70,7 +70,7 @@ exports.handler = async (event) => {
             };
         } catch (error) {
             return {
-                statusCode: 401,
+                statusCode: 400,
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ error: "Authentication failed", details: error.message })
             };
