@@ -182,7 +182,9 @@
     "sms_configuration": {},
     "username_attributes": [],
     "custom_attributes": [],
-    "client": {},
+    "client": {
+      
+    },
     "tags": {}
   }
 }
