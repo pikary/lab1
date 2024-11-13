@@ -13,7 +13,7 @@
   "alias": "${lambdas_alias_name}",
   "dependencies": [
     {
-      "resource_name": "${userpool_name}",
+      "resource_name": "${booking_userpool}",
       "resource_type": "cognito_idp"
     }
   ],
@@ -24,7 +24,7 @@
       "parameter": "id"
     },
     "CUPClientId": {
-      "resource_name": "${booking_userpool}",
+      "resource_name": "${client_id}",
       "resource_type": "cognito_idp",
       "parameter": "client_id"
     }
