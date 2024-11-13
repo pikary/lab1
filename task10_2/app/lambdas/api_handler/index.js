@@ -35,13 +35,13 @@ exports.handler = async (event) => {
         try {
             await cognitoIdentityServiceProvider.adminCreateUser(params).promise();
             return {
-                statusCode: 201,
+                statusCode: 200,
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ message: "User created successfully" })
             };
         } catch (error) {
             return {
-                statusCode: 500,
+                statusCode: 400,
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ error: "Signup failed", details: error.message })
             };
