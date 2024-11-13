@@ -58,7 +58,7 @@ exports.handler = async (event) => {
     if (event.resource === '/signin' && event.httpMethod === 'POST') {
         const { email, password } = body;
         const params = {
-            AuthFlow: 'ADMIN_USER_PASSWORD_AUTH',
+            AuthFlow: 'ADMIN_NO_SRP_AUTH',
             UserPoolId: userPoolId,
             ClientId: clientId,
             AuthParameters: {
@@ -72,7 +72,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 200,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ data })
+                body: JSON.stringify({ accessToken: data.AuthenticationResult.AccessToken})
             };
         } catch (error) {
             console.log(error);
