@@ -72,7 +72,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 200,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ accessToken: data.AuthenticationResult.AccessToken})
+                body: JSON.stringify({ accessToken: data.accessToken.Session})
             };
         } catch (error) {
             console.log(error);
