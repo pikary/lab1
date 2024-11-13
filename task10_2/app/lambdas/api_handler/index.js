@@ -72,7 +72,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 200,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ idToken: data.AuthenticationResult.IdToken })
+                body: JSON.stringify({ data })
             };
         } catch (error) {
             console.log(error);
@@ -80,7 +80,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 400,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ error: "Authentication failed", details: error.message })
+                body: JSON.stringify({ error: "Authentication failed", details: error })
             };
         }
     }
