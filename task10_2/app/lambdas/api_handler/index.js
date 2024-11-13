@@ -4,6 +4,10 @@ const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider({
     region: process.env.region
 });
 
+const dynamoDB = new AWS.DynamoDB.DocumentClient();
+const reservationsTable = process.env.revtable
+const tablesTable = process.env.tablestable
+
 exports.handler = async (event) => {
     const userPoolId = process.env.CUPId;
     const clientId = process.env.CUPClientId;
@@ -40,6 +44,8 @@ exports.handler = async (event) => {
                 body: JSON.stringify({ message: "User created successfully" })
             };
         } catch (error) {
+            console.log(error);
+
             return {
                 statusCode: 400,
                 headers: { "Content-Type": "application/json" },
@@ -79,55 +85,133 @@ exports.handler = async (event) => {
 
     // Handle `/tables` resource
     if (event.resource === '/tables' && event.httpMethod === 'GET') {
-        // Your logic to fetch and return table data from DynamoDB
-        // Example response (replace with actual DynamoDB integration):
-        return {
-            statusCode: 200,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ tables: [] })
+        const params = {
+            TableName: tablesTable
         };
+
+        try {
+            const data = await dynamoDB.scan(params).promise();
+            return {
+                statusCode: 200,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ tables: data.Items }) // Returns all tables
+            };
+        } catch (error) {
+            console.error(error);
+            return {
+                statusCode: 500,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ error: "Failed to fetch tables", details: error.message })
+            };
+        }
     }
 
     if (event.resource === '/tables' && event.httpMethod === 'POST') {
-        const { tableData } = body;
-        // Your logic to insert table data into DynamoDB
-        // Example response (replace with actual DynamoDB integration):
-        return {
-            statusCode: 200,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: "Table data added successfully" })
-        };
+        try{
+            const params = {
+                TableName: tablesTable,
+                Item:body
+            };
+            await dynamoDB.put(params).promise()
+            return {
+                statusCode: 200,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: "Table data added successfully" })
+            };
+        }catch(e){
+            console.log(e);
+            return {
+                statusCode: 500,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: "error" })
+            };
+        }
+        
     }
 
     // Handle `/tables/{tableId}` resource for GET method
     if (event.resource === '/tables/{tableId}' && event.httpMethod === 'GET') {
         const tableId = event.pathParameters.tableId;
-        // Your logic to fetch table data for a specific table ID
-        return {
-            statusCode: 200,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ tableId: tableId, data: {} }) // Replace with actual data
+        const params = {
+            TableName: tablesTable,
+            Key: { id: tableId } // Assuming `id` is the primary key in the tablesTable
         };
+        try {
+            const data = await dynamoDB.get(params).promise();
+            if (data.Item) {
+                return {
+                    statusCode: 200,
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ tableId: tableId, data: data.Item })
+                };
+            } else {
+                return {
+                    statusCode: 404,
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ error: "Table not found" })
+                };
+            }
+        } catch (error) {
+            console.error(error);
+            return {
+                statusCode: 500,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ error: "Failed to fetch table data", details: error.message })
+            };
+        }
     }
 
-    // Handle `/reservations` resource
+
+
+
+
+
     if (event.resource === '/reservations' && event.httpMethod === 'GET') {
-        // Your logic to fetch reservation data from DynamoDB
-        return {
-            statusCode: 200,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ reservations: [] }) // Replace with actual data
-        };
+        try {
+            const params = { TableName: reservationsTable }
+            const data = await dynamoDB.scan(params).promise()
+            return {
+                statusCode: 200,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ reservations: data }) // Replace with actual data
+            };
+        } catch (e) {
+            console.log(e);
+
+            return {
+                statusCode: 500,
+                headers: { "Content-Type": "application/json" },
+                body: e.message
+            }
+        }
+
     }
+
+
+
 
     if (event.resource === '/reservations' && event.httpMethod === 'POST') {
-        const { reservationData } = body;
-        // Your logic to add reservation data to DynamoDB
-        return {
-            statusCode: 200,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: "Reservation created successfully" })
-        };
+        try {
+            const reservationData = body;
+            const params = {
+                TableName: reservationsTable,
+                Item: reservationData // Assuming reservationData is an object with required attributes
+            };
+            await dynamoDB.put(params).promise();
+            return {
+                statusCode: 200,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: "Reservation created successfully" })
+            };
+        } catch (e) {
+            console.log(e);
+            return {
+                statusCode: 500,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: "Reservation created successfully" })
+            };
+        }
+
     }
 
     return {

@@ -27,7 +27,9 @@
       "resource_name": "${booking_userpool}",
       "resource_type": "cognito_idp",
       "parameter": "${client_id}"
-    }
+    },
+    "tablestable": "${tables_table}",
+    "revtable": "${reservations_table}"
   },
   "url_config": {},
   "ephemeral_storage": 512,
