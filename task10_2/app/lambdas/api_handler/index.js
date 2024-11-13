@@ -93,7 +93,7 @@ exports.handler = async (event) => {
         // Your logic to insert table data into DynamoDB
         // Example response (replace with actual DynamoDB integration):
         return {
-            statusCode: 201,
+            statusCode: 200,
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message: "Table data added successfully" })
         };
@@ -124,7 +124,7 @@ exports.handler = async (event) => {
         const { reservationData } = body;
         // Your logic to add reservation data to DynamoDB
         return {
-            statusCode: 201,
+            statusCode: 200,
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message: "Reservation created successfully" })
         };
