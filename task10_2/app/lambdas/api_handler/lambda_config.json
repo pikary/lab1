@@ -21,12 +21,12 @@
     "CUPId": {
       "resource_name": "${booking_userpool}",
       "resource_type": "cognito_idp",
-      "parameter": "${cup_id}"
+      "parameter": "id"
     },
     "CUPClientId": {
       "resource_name": "${booking_userpool}",
       "resource_type": "cognito_idp",
-      "parameter": "${client_id}"
+      "parameter": "client_id"
     },
     "tablestable": "${tables_table}",
     "revtable": "${reservations_table}"
