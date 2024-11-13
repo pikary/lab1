@@ -85,16 +85,27 @@ exports.handler = async (event) => {
         }
     }
 
-    // Handle `/tables` resource
-    // if (event.resource === '/tables' && event.httpMethod === 'GET') {
-    //     // Your logic to fetch and return table data from DynamoDB
-    //     // Example response (replace with actual DynamoDB integration):
-    //     return {
-    //         statusCode: 200,
-    //         headers: { "Content-Type": "application/json" },
-    //         body: JSON.stringify({ tables: [] })
-    //     };
-    // }
+    if (event.resource === '/tables' && event.httpMethod === 'GET') {
+        const params = {
+            TableName: tablesTable
+        };
+        try {
+            const data = await dynamoDB.scan(params).promise();
+            return {
+                statusCode: 200,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ tables: data.Items }) // Returns all tables
+            };
+        } catch (error) {
+            console.error(error);
+            return {
+                statusCode: 500,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ error: "Failed to fetch tables", details: error.message })
+            };
+        }
+    }
+
 
     if (event.resource === '/tables' && event.httpMethod === 'POST') {
         try{
