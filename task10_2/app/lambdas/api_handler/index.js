@@ -28,7 +28,7 @@ exports.handler = async (event) => {
             UserPoolId: userPoolId,
             Username: email,
             TemporaryPassword: password,
-            MessageAction: "SUPPRESS", 
+            // MessageAction: "SUPPRESS", 
             UserAttributes: [
                 { Name: 'email', Value: email },
                 { Name: 'name', Value: firstName + lastName }
@@ -68,10 +68,14 @@ exports.handler = async (event) => {
 
         try {
             const data = await cognitoIdentityServiceProvider.adminInitiateAuth(params).promise();
+            console.log(data);
+            
             return {
                 statusCode: 200,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ accessToken: data.accessToken.Session})
+                body: JSON.stringify({ accessToken: data?.accessToken?.Session || 
+                'blank'
+                })
             };
         } catch (error) {
             console.log(error);
