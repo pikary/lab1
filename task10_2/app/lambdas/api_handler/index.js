@@ -219,15 +219,17 @@ exports.handler = async (event) => {
     }
 
     async function checkIfTableExists(tableNumber) {
-        const params = {
-            TableName: tablesTable,
-            FilterExpression: "number = :tableNumber",
+        var params = {
             ExpressionAttributeValues: {
-                ":tableNumber": parseInt(tableNumber)
-            }
+                ":number":parseInt(tableNumber)
+            },
+            KeyConditionExpression: "number = :number",
+            ProjectionExpression: "id, number, places",
+            TableName: "cmtr-77278c6b-Reservations-test",
         };
-        const data = await dynamoDB.get(params).promise();
-        return data.Item !== undefined;
+    
+        const data = await dynamoDB.scan(params).promise();
+        return data.Items.length > 0 ;
     }
 
     async function isValidTableNumber(tableNumber) {
@@ -256,7 +258,7 @@ exports.handler = async (event) => {
 
     async function hasOverlappingReservation(reservationData) {
         const params = {
-            TableName: reservationsTable,
+            TableName: 'cmtr-77278c6b-Reservations-test',
             FilterExpression: "number = :number AND #date = :date",
             ExpressionAttributeNames: {
                 "#date": "date"
@@ -313,18 +315,24 @@ exports.handler = async (event) => {
                     body: JSON.stringify({ message: "NO TABLE DATA" })
                 };
             }
-            if (await hasOverlappingReservation(reservationData)) {
-                return {
-                    statusCode: 400,
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: "Reservation time overlaps with an existing reservation" })
-                };
-            }
+            // if (await hasOverlappingReservation(reservationData)) {
+            //     return {
+            //         statusCode: 400,
+            //         headers: { "Content-Type": "application/json" },
+            //         body: JSON.stringify({ message: "Reservation time overlaps with an existing reservation" })
+            //     };
+            // }
             const id = uuidv4();
             const params = {
-                TableName: 'cmtr-77278c6b-Reservations-test', 
+                TableName: 'cmtr-77278c6b-Reservations-test',
                 Item: {
-                    id: id,
+                    "id": id,
+                    "tableNumber": body.tableNumber,
+                    "clientName": body.clientName,
+                    "phoneNumber": body.phoneNumber,
+                    "date": body.date,
+                    "slotTimeStart": body.slotTimeStart,
+                    "slotTimeEnd": body.slotTimeEnd
                 }
             };
             await dynamoDB.put(params).promise();
@@ -334,13 +342,13 @@ exports.handler = async (event) => {
                 body: JSON.stringify({ reservationId: id })
             };
 
-    
+
         } catch (e) {
             console.log(e);
             return {
                 statusCode: 500,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: e.message})
+                body: JSON.stringify({ message: e.message })
             };
         }
     }
