@@ -283,10 +283,11 @@ exports.handler = async (event) => {
             // Validate tableNumber field in reservationData
             const isTableReserved = await isValidTableNumber(reservationData.tableNumber)
             if (isTableReserved) {
+
                 return {
                     statusCode: 400,
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: "Invalid table number" })
+                    body: JSON.stringify({ message: "TABLE IS RESERVEd" })
                 };
             }
             const isExist = await checkIfTableExists(reservationData.tableNumber)
@@ -301,7 +302,7 @@ exports.handler = async (event) => {
                 return {
                     statusCode: 400,
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: "Invalid table number" })
+                    body: JSON.stringify({ message: "NO TABLE DATA" })
                 };
             }
             // if (await hasOverlappingReservation(reservationData)) {
