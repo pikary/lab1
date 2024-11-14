@@ -346,7 +346,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 500,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: "Error creating reservation" })
+                body: JSON.stringify({ message: e.message})
             };
         }
     }
