@@ -324,13 +324,13 @@ exports.handler = async (event) => {
             const params = {
                 TableName: 'cmtr-77278c6b-Reservations-test', 
                 Item: {
-                    id: id,
-                    tableNumber:body.tableNumber,
-                    clientName:body.clientName,
-                    phoneNumber:body.phoneNumber,
-                    date:body.date,
-                    slotTimeStart:body.slotTimeStart,
-                    slotTimeEnd:body.slotTimeEnd
+                    "id": id,
+                    "tableNumber":body.tableNumber,
+                    "clientName":body.clientName,
+                    "phoneNumber":body.phoneNumber,
+                    "date":body.date,
+                    "slotTimeStart":body.slotTimeStart,
+                    "slotTimeEnd":body.slotTimeEnd
                 }
             };
             await dynamoDB.put(params).promise();
