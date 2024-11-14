@@ -316,7 +316,7 @@ exports.handler = async (event) => {
             const params = {
                 TableName: reservationsTable,
                 Item: {
-                    id: id,
+                    Key: id,
                     ...reservationData
                 }
             };
