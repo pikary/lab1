@@ -291,7 +291,7 @@ exports.handler = async (event) => {
                 };
             }
             const isExist = await checkIfTableExists(reservationData.tableNumber)
-            if(!isExist){
+            if (!isExist) {
                 return {
                     statusCode: 400,
                     headers: { "Content-Type": "application/json" },
@@ -316,7 +316,7 @@ exports.handler = async (event) => {
             const params = {
                 TableName: reservationsTable,
                 Item: {
-                    Key: id,
+                    Key: { id: id },
                     ...reservationData
                 }
             };
