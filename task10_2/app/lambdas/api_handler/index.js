@@ -248,7 +248,7 @@ exports.handler = async (event) => {
                             "N": parsedTableNumber
                         }
                     },
-                    FilterExpression: "#tableNumber = :tableNumberValue",
+                    KeyConditionExpression: "tableNumber = :tableNumberValue",
                 })
                 .promise();
             return response.Items.length > 0 ? true : false;
@@ -270,7 +270,7 @@ exports.handler = async (event) => {
                             "N": parseInt(tableNumber)
                         }
                     },
-                    FilterExpression: "tableNumber = :tableNumberValue",
+                    KeyConditionExpression: "tableNumber = :tableNumberValue",
                 })
                 .promise();
             for (const item of response.Items) {
