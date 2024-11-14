@@ -276,76 +276,55 @@ exports.handler = async (event) => {
     }
 
     if (event.resource === '/reservations' && event.httpMethod === 'POST') {
-        try {
-            const reservationData = body;
+        const reservationData = body;
 
-            // Validate tableNumber field in reservationData
-            const isTableReserved = await isValidTableNumber(body.tableNumber)
-            if (isTableReserved) {
-
-                return {
-                    statusCode: 400,
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: "TABLE IS RESERVEd" })
-                };
-            }
-            const isExist = await checkIfTableExists(body.tableNumber)
-            if (!isExist) {
-                return {
-                    statusCode: 400,
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: "table do not exist" })
-                };
-            }
-            if (!body.tableNumber) {
-                return {
-                    statusCode: 400,
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: "NO TABLE DATA" })
-                };
-            }
-            // if (await hasOverlappingReservation(reservationData)) {
-            //     return {
-            //         statusCode: 400,
-            //         headers: { "Content-Type": "application/json" },
-            //         body: JSON.stringify({ message: "Reservation time overlaps with an existing reservation" })
-            //     };
-            // }
-            const id = uuid.v4();
-
-            const a = JSON.parse(JSON.stringify(body))
-            a.id = id
-            console.log("ZDAROVA!!!!!!!!!!!!");
-            
-            console.log(a);
-        
-            const params = {
-                TableName: reservationsTable,
-                Item:{
-                    id:id,
-                    tableNumber:body.tableNumber,
-                    clientName: body.clientName,
-                    phoneNumber: body.phoneNumber,
-                    date: body.data,
-                    slotTimeStart: body.slotTimeStart,
-                    slotTimeEnd: body.slotTimeEnd,
-                }
-            };
-            await dynamoDB.put(params).promise();
+        // Validate tableNumber field in reservationData
+        const isTableReserved = await isValidTableNumber(body.tableNumber)
+        if (isTableReserved) {
 
             return {
-                statusCode: 200,
+                statusCode: 400,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ reservationId: id })
-            };
-        } catch (e) {
-            console.log(e);
-            return {
-                statusCode: 500,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: "Error creating reservation" })
+                body: JSON.stringify({ message: "TABLE IS RESERVEd" })
             };
         }
+        const isExist = await checkIfTableExists(body.tableNumber)
+        if (!isExist) {
+            return {
+                statusCode: 400,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: "table do not exist" })
+            };
+        }
+        if (!body.tableNumber) {
+            return {
+                statusCode: 400,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: "NO TABLE DATA" })
+            };
+        }
+        // if (await hasOverlappingReservation(reservationData)) {
+        //     return {
+        //         statusCode: 400,
+        //         headers: { "Content-Type": "application/json" },
+        //         body: JSON.stringify({ message: "Reservation time overlaps with an existing reservation" })
+        //     };
+        // }
+        const id = uuid.v4();
+        const params = {
+            TableName: reservationsTable,
+            Item: {
+                id: uuid.v4(),
+
+            }
+        };
+        await dynamoDB.put(params).promise();
+
+        return {
+            statusCode: 200,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ reservationId: id })
+        };
     }
 
 
