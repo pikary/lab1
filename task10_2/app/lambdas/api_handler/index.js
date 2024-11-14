@@ -280,7 +280,7 @@ exports.handler = async (event) => {
             const reservationData = body;
 
             // Validate tableNumber field in reservationData
-            const isTableReserved = await isValidTableNumber(reservationData.tableNumber)
+            const isTableReserved = await isValidTableNumber(body.tableNumber)
             if (isTableReserved) {
 
                 return {
@@ -289,7 +289,7 @@ exports.handler = async (event) => {
                     body: JSON.stringify({ message: "TABLE IS RESERVEd" })
                 };
             }
-            const isExist = await checkIfTableExists(reservationData.tableNumber)
+            const isExist = await checkIfTableExists(body.tableNumber)
             if (!isExist) {
                 return {
                     statusCode: 400,
@@ -297,7 +297,7 @@ exports.handler = async (event) => {
                     body: JSON.stringify({ message: "table do not exist" })
                 };
             }
-            if (!reservationData.tableNumber) {
+            if (!body.tableNumber) {
                 return {
                     statusCode: 400,
                     headers: { "Content-Type": "application/json" },
@@ -313,13 +313,16 @@ exports.handler = async (event) => {
             // }
             const id = uuid.v4();
 
-            const a = Object.assign(reservationData,{id:id})
+            const a = JSON.parse(JSON.stringify(body))
+            a.id = id
+            console.log("ZDAROVA!!!!!!!!!!!!");
+            
             console.log(a);
         
             const params = {
                 TableName: reservationsTable,
                 Item:{
-                    reservationId:id,
+                    id:id,
                     tableNumber:body.tableNumber,
                     clientName: body.clientName,
                     phoneNumber: body.phoneNumber,
