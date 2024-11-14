@@ -25,18 +25,32 @@ exports.handler = async (event) => {
         
         const { email, password, firstName, lastName } = body;
         const params = {
-            UserPoolId: userPoolId,
+            ClientId: clientId,
             Username: email,
-            TemporaryPassword: password,
+            Password: password,
+            UserAttributes: [{ Name: 'email', Value: email }],
             MessageAction: "SUPPRESS", 
-            UserAttributes: [
-                { Name: 'email', Value: email },
-                { Name: 'name', Value: firstName + lastName }
-            ]
         };
 
+        // const params = {
+        //     ClientId:clientId,
+        //     UserPoolId: userPoolId,
+        //     Username: email,
+        //     Password: password,
+        //     MessageAction: "SUPPRESS", 
+        //     UserAttributes: [
+        //         { Name: 'email', Value: email },
+        //         { Name: 'name', Value: firstName + lastName }
+        //     ]
+        // };
+        const confirmParams = {
+            Username: body.email,
+            UserPoolId: userPoolId
+        };
         try {
             await cognitoIdentityServiceProvider.adminCreateUser(params).promise();
+            const confirmedResult = await cognitoIdentityServiceProvider.adminConfirmSignUp(confirmParams).promise();
+
             return {
                 statusCode: 200,
                 headers: { "Content-Type": "application/json" },
