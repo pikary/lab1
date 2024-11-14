@@ -211,10 +211,9 @@ exports.handler = async (event) => {
 
     async function isValidTableNumber(tableNumber) {
         const params = {
-            TableName: tablesTable, // Your DynamoDB table with table details
-            Key: { tableNumber }
+            TableName: tablesTable,
+            Key: { id: parseInt(tableNumber) } // Assuming `id` is the primary key in the tablesTable
         };
-
         try {
             const data = await dynamoDB.get(params).promise();
             return data.Item !== undefined;
@@ -261,8 +260,8 @@ exports.handler = async (event) => {
             const id = uuid.v4();
 
             // Validate tableNumber field in reservationData
-            // const isValid = await isValidTableNumber(reservationData.tableNumber)
-            if (!reservationData.tableNumber) {
+            const isValid = await isValidTableNumber(reservationData.tableNumber)
+            if (!reservationData.tableNumber || !isValid) {
                 return {
                     statusCode: 400,
                     headers: { "Content-Type": "application/json" },
@@ -276,7 +275,7 @@ exports.handler = async (event) => {
                     body: JSON.stringify({ message: "Reservation time overlaps with an existing reservation" })
                 };
             }
-    
+
             const params = {
                 TableName: reservationsTable,
                 Item: {
