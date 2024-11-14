@@ -28,7 +28,7 @@ exports.handler = async (event) => {
             UserPoolId: userPoolId,
             Username: email,
             TemporaryPassword: password,
-            // MessageAction: "SUPPRESS", 
+            MessageAction: "SUPPRESS", 
             UserAttributes: [
                 { Name: 'email', Value: email },
                 { Name: 'name', Value: firstName + lastName }
@@ -58,7 +58,6 @@ exports.handler = async (event) => {
         const { email, password } = body;
         const params = {
             AuthFlow: 'ADMIN_NO_SRP_AUTH',
-            MessageAction: "SUPPRESS", 
             UserPoolId: userPoolId,
             ClientId: clientId,
             AuthParameters: {
