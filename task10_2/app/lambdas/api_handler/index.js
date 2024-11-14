@@ -209,6 +209,18 @@ exports.handler = async (event) => {
 
     }
 
+    async function checkIfTableExists(tableNumber) {
+        const params = {
+            TableName: tablesTable,
+            FilterExpression: "number = :tableNumber",
+            ExpressionAttributeValues: {
+                ":tableNumber": parseInt(tableNumber)
+            }
+        };
+        const data = await dynamoDB.get(params).promise();
+        return data.Item !== undefined;
+    }
+
     async function isValidTableNumber(tableNumber) {
         // const params = {
         //     TableName: tablesTable,
@@ -222,7 +234,7 @@ exports.handler = async (event) => {
                 ":tableNumber": parsedTableNumber
             }
         };
-    
+
         try {
             const data = await dynamoDB.get(params).promise();
             return data.Item !== undefined;
@@ -270,11 +282,19 @@ exports.handler = async (event) => {
 
             // Validate tableNumber field in reservationData
             const isTableReserved = await isValidTableNumber(reservationData.tableNumber)
-            if(isTableReserved){
+            if (isTableReserved) {
                 return {
                     statusCode: 400,
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ message: "Invalid table number" })
+                };
+            }
+            const isExist = await checkIfTableExists(reservationData.tableNumber)
+            if(!isExist){
+                return {
+                    statusCode: 400,
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: "table do not exist" })
                 };
             }
             if (!reservationData.tableNumber) {
