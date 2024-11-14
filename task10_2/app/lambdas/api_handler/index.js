@@ -11,12 +11,12 @@ const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider({
     region: process.env.region
 });
 
-const dynamoDBClient = new DynamoDBClient({ region: process.env.region });
+const dynamoDBClient = new DynamoDBClient({ region: 'eu-central-1' });
 const dynamoDBDocumentClient = DynamoDBDocumentClient.from(dynamoDBClient);
 
 
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
-const reservationsTable = process.env.revtable
+const reservationsTable = 'cmtr-77278c6b-Reservations-test'
 const tablesTable = process.env.tablestable
 
 exports.handler = async (event) => {
@@ -218,17 +218,17 @@ exports.handler = async (event) => {
 
     }
 
-    async function checkIfTableExists(tableNumber) {
-        const params = {
-            TableName: tablesTable,
-            FilterExpression: "number = :tableNumber",
-            ExpressionAttributeValues: {
-                ":tableNumber": parseInt(tableNumber)
-            }
-        };
-        const data = await dynamoDB.get(params).promise();
-        return data.Item !== undefined;
-    }
+    // async function checkIfTableExists(tableNumber) {
+    //     const params = {
+    //         TableName: tablesTable,
+    //         FilterExpression: "number = :tableNumber",
+    //         ExpressionAttributeValues: {
+    //             ":tableNumber": parseInt(tableNumber)
+    //         }
+    //     };
+    //     const data = await dynamoDB.get(params).promise();
+    //     return data.Item !== undefined;
+    // }
 
     async function isValidTableNumber(tableNumber) {
         // const params = {
@@ -254,35 +254,35 @@ exports.handler = async (event) => {
     }
 
 
-    async function hasOverlappingReservation(reservationData) {
-        const params = {
-            TableName: reservationsTable,
-            FilterExpression: "number = :number AND #date = :date",
-            ExpressionAttributeNames: {
-                "#date": "date"
-            },
-            ExpressionAttributeValues: {
-                ":number": reservationData.tableNumber,
-                ":date": reservationData.date
-            }
-        };
+    // async function hasOverlappingReservation(reservationData) {
+    //     const params = {
+    //         TableName: reservationsTable,
+    //         FilterExpression: "number = :number AND #date = :date",
+    //         ExpressionAttributeNames: {
+    //             "#date": "date"
+    //         },
+    //         ExpressionAttributeValues: {
+    //             ":number": reservationData.tableNumber,
+    //             ":date": reservationData.date
+    //         }
+    //     };
 
-        const data = await dynamoDB.scan(params).promise();
+    //     const data = await dynamoDB.scan(params).promise();
 
-        for (const item of data.Items) {
-            const existingStart = new Date(`${item.date} ${item.slotTimeStart}`).getTime();
-            const existingEnd = new Date(`${item.date} ${item.slotTimeEnd}`).getTime();
-            const newStart = new Date(`${reservationData.date} ${reservationData.slotTimeStart}`).getTime();
-            const newEnd = new Date(`${reservationData.date} ${reservationData.slotTimeEnd}`).getTime();
+    //     for (const item of data.Items) {
+    //         const existingStart = new Date(`${item.date} ${item.slotTimeStart}`).getTime();
+    //         const existingEnd = new Date(`${item.date} ${item.slotTimeEnd}`).getTime();
+    //         const newStart = new Date(`${reservationData.date} ${reservationData.slotTimeStart}`).getTime();
+    //         const newEnd = new Date(`${reservationData.date} ${reservationData.slotTimeEnd}`).getTime();
 
-            // Check if the time slots overlap
-            if (newStart < existingEnd && newEnd > existingStart) {
-                return true; // Overlap detected
-            }
-        }
+    //         // Check if the time slots overlap
+    //         if (newStart < existingEnd && newEnd > existingStart) {
+    //             return true; // Overlap detected
+    //         }
+    //     }
 
-        return false; // No overlap
-    }
+    //     return false; // No overlap
+    // }
 
     if (event.resource === '/reservations' && event.httpMethod === 'POST') {
         try {
@@ -313,18 +313,18 @@ exports.handler = async (event) => {
                     body: JSON.stringify({ message: "NO TABLE DATA" })
                 };
             }
-            // if (await hasOverlappingReservation(reservationData)) {
-            //     return {
-            //         statusCode: 400,
-            //         headers: { "Content-Type": "application/json" },
-            //         body: JSON.stringify({ message: "Reservation time overlaps with an existing reservation" })
-            //     };
-            // }
+            if (await hasOverlappingReservation(reservationData)) {
+                return {
+                    statusCode: 400,
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: "Reservation time overlaps with an existing reservation" })
+                };
+            }
             const id = uuidv4();
             const params = {
-                TableName: reservationsTable, 
+                TableName: 'cmtr-77278c6b-Reservations-test', 
                 Item: {
-                    "id": id,
+                    id: body
                 }
             };
             await dynamoDB.put(params).promise();
