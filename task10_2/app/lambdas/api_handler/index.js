@@ -278,7 +278,6 @@ exports.handler = async (event) => {
     if (event.resource === '/reservations' && event.httpMethod === 'POST') {
         try {
             const reservationData = body;
-            const id = uuid.v4();
 
             // Validate tableNumber field in reservationData
             const isTableReserved = await isValidTableNumber(reservationData.tableNumber)
@@ -312,10 +311,22 @@ exports.handler = async (event) => {
             //         body: JSON.stringify({ message: "Reservation time overlaps with an existing reservation" })
             //     };
             // }
+            const id = uuid.v4();
+
             const a = Object.assign(reservationData,{id:id})
+            console.log(a);
+        
             const params = {
                 TableName: reservationsTable,
-                Item:a
+                Item:{
+                    reservationId:id,
+                    tableNumber:body.tableNumber,
+                    clientName: body.clientName,
+                    phoneNumber: body.phoneNumber,
+                    date: body.data,
+                    slotTimeStart: body.slotTimeStart,
+                    slotTimeEnd: body.slotTimeEnd,
+                }
             };
             await dynamoDB.put(params).promise();
 
