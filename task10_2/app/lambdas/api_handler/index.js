@@ -1,4 +1,6 @@
 const AWS = require('aws-sdk');
+const uuid = require('uuid')
+
 
 const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider({
     region: process.env.region
@@ -146,13 +148,14 @@ exports.handler = async (event) => {
         }
         
     }
+    
 
     // Handle `/tables/{tableId}` resource for GET method
     if (event.resource === '/tables/{tableId}' && event.httpMethod === 'GET') {
         const tableId = event.pathParameters.tableId;
         const params = {
             TableName: tablesTable,
-            Key: { id: tableId } // Assuming `id` is the primary key in the tablesTable
+            Key: { id: parseInt(tableId) } // Assuming `id` is the primary key in the tablesTable
         };
         try {
             const data = await dynamoDB.get(params).promise();
@@ -211,15 +214,19 @@ exports.handler = async (event) => {
     if (event.resource === '/reservations' && event.httpMethod === 'POST') {
         try {
             const reservationData = body;
+            const id = uuid.v4()
             const params = {
                 TableName: reservationsTable,
-                Item: reservationData // Assuming reservationData is an object with required attributes
+                Item: {
+                    id:id,
+                    ...reservationData
+                } // Assuming reservationData is an object with required attributes
             };
             await dynamoDB.put(params).promise();
             return {
                 statusCode: 200,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: "Reservation created successfully" })
+                body: JSON.stringify({ reservationId:id })
             };
         } catch (e) {
             console.log(e);
