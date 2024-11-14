@@ -298,14 +298,14 @@ exports.handler = async (event) => {
                     body: JSON.stringify({ message: "TABLE IS RESERVEd" })
                 };
             }
-            const isExist = await checkIfTableExists(body.tableNumber)
-            if (!isExist) {
-                return {
-                    statusCode: 400,
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: "table do not exist" })
-                };
-            }
+            // const isExist = await checkIfTableExists(body.tableNumber)
+            // if (!isExist) {
+            //     return {
+            //         statusCode: 400,
+            //         headers: { "Content-Type": "application/json" },
+            //         body: JSON.stringify({ message: "table do not exist" })
+            //     };
+            // }
             if (!body.tableNumber) {
                 return {
                     statusCode: 400,
