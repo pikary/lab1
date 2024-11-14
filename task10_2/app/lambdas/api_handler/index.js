@@ -221,36 +221,36 @@ exports.handler = async (event) => {
     async function checkIfTableExists(tableNumber) {
         var params = {
             ExpressionAttributeValues: {
-                ":tableNumber":parseInt(tableNumber)
+                ":tableNumber": parseInt(tableNumber)
             },
             FilterExpression: "number = :tableNumber",
             KeyConditionExpression: "number = :tableNumber",
             ProjectionExpression: "id, places",
             TableName: "cmtr-77278c6b-Tables-test",
         };
-    
+
         const data = await dynamoDB.scan(params).promise();
-        return data.Items.length > 0 ;
+        return data.Items.length > 0;
     }
 
-    async function isValidTableNumber(tableNumber) {
-        // const params = {
-        //     TableName: tablesTable,
-        //     Key: { id: parseInt(tableNumber) } // Assuming `id` is the primary key in the tablesTable
-        // };
+    async function isTableExist(tableNumber) {
         const parsedTableNumber = parseInt(tableNumber)
-        const params = {
-            TableName: 'cmtr-77278c6b-Tables-test',
-            FilterExpression: "tableNumber = :tableNumber",
-            ExpressionAttributeValues: {
-                ":tableNumber": parsedTableNumber
-            },
-            ProjectionExpression: "id, places",
-        };
+        //we check if table exists here
 
         try {
-            const data = await dynamoDB.query(params).promise();
-            return data.Items.length > 0 ? false : true;
+            const response = await dynamoDB
+                .query({
+                    TableName: "cmtr-77278c6b-Tables-test",
+                    ExpressionAttributeNames: {
+                        "#tableNumber": `${parseInt(tableNumber)}`,
+                    },
+                    ExpressionAttributeValues: {
+                        ":tableNumberValue": "tableNumber"
+                    },
+                    FilterExpression: "#number = :tableNumberValue",
+                })
+                .promise();
+            return response.Items.length > 0 ? true : false;
         } catch (error) {
             console.error("Error checking table existence:", error);
             return false;
@@ -259,70 +259,66 @@ exports.handler = async (event) => {
 
 
     async function hasOverlappingReservation(reservationData) {
-        const params = {
-            TableName: 'cmtr-77278c6b-Reservations-test',
-            FilterExpression: "number = :tableNumber AND #date = :date",
-            ExpressionAttributeNames: {
-                "#date": "date"
-            },
-            ExpressionAttributeValues: {
-                ":tableNumber": reservationData.tableNumber,
-                ":date": reservationData.date
+        try {
+            const tableNumber = reservationData.tableNumber
+            const response = await dynamoDB
+                .query({
+                    TableName: "cmtr-77278c6b-Reservations-test",
+                    ExpressionAttributeNames: {
+                        "#tableNumber": `${parseInt(tableNumber)}`,
+                    },
+                    ExpressionAttributeValues: {
+                        ":tableNumberValue": "tableNumber"
+                    },
+                    FilterExpression: "#tableNumber = :tableNumberValue",
+                })
+                .promise();
+            for (const item of response.Items) {
+                const existingStart = new Date(`${item.date} ${item.slotTimeStart}`).getTime();
+                const existingEnd = new Date(`${item.date} ${item.slotTimeEnd}`).getTime();
+                const newStart = new Date(`${reservationData.date} ${reservationData.slotTimeStart}`).getTime();
+                const newEnd = new Date(`${reservationData.date} ${reservationData.slotTimeEnd}`).getTime();
+
+                // Check if the time slots overlap
+                if (newStart < existingEnd && newEnd > existingStart) {
+                    return true; // Overlap detected
+                }
             }
-        };
 
-        const data = await dynamoDB.scan(params).promise();
-
-        for (const item of data.Items) {
-            const existingStart = new Date(`${item.date} ${item.slotTimeStart}`).getTime();
-            const existingEnd = new Date(`${item.date} ${item.slotTimeEnd}`).getTime();
-            const newStart = new Date(`${reservationData.date} ${reservationData.slotTimeStart}`).getTime();
-            const newEnd = new Date(`${reservationData.date} ${reservationData.slotTimeEnd}`).getTime();
-
-            // Check if the time slots overlap
-            if (newStart < existingEnd && newEnd > existingStart) {
-                return true; // Overlap detected
-            }
+            return false; // No overlap
+        } catch (e) {
+            console.log(e);
+            
+            throw(e)
         }
 
-        return false; // No overlap
     }
+
+
 
     if (event.resource === '/reservations' && event.httpMethod === 'POST') {
         try {
-            const reservationData = body;
-
-            // Validate tableNumber field in reservationData
-            const isTableReserved = await isValidTableNumber(body.tableNumber)
-            if (isTableReserved) {
-                return {
-                    statusCode: 400,
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: "TABLE IS RESERVEd" })
-                };
-            }
-            const isExist = await checkIfTableExists(body.tableNumber)
-            if (!isExist) {
+            // identify if table exists
+            const tableExistence = await isTableExist(body.tableNumber)
+            if (!tableExistence) {
+                console.log('table do not exist');
                 return {
                     statusCode: 400,
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ message: "table do not exist" })
-                };
+                }
             }
-            if (!body.tableNumber) {
+            // identify if new reservation overlaping older
+            const isOverlaping = await hasOverlappingReservation(body)
+            if (isOverlaping) {
+                console.log('You are overlapping reservation. Cancel');
                 return {
                     statusCode: 400,
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: "NO TABLE DATA" })
-                };
+                    body: JSON.stringify({ message: "You are overlapping reservation. Cancel" })
+                }
             }
-            // if (await hasOverlappingReservation(reservationData)) {
-            //     return {
-            //         statusCode: 400,
-            //         headers: { "Content-Type": "application/json" },
-            //         body: JSON.stringify({ message: "Reservation time overlaps with an existing reservation" })
-            //     };
-            // }
+
             const id = uuidv4();
             const params = {
                 TableName: 'cmtr-77278c6b-Reservations-test',
@@ -342,8 +338,6 @@ exports.handler = async (event) => {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ reservationId: id })
             };
-
-
         } catch (e) {
             console.log(e);
             return {
