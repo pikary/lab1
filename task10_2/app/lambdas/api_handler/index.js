@@ -312,11 +312,10 @@ exports.handler = async (event) => {
             //         body: JSON.stringify({ message: "Reservation time overlaps with an existing reservation" })
             //     };
             // }
-
+            const a = Object.assign(reservationData,{id:id})
             const params = {
                 TableName: reservationsTable,
-                Item:{ ...reservationData, id: id }
-
+                Item:a
             };
             await dynamoDB.put(params).promise();
 
