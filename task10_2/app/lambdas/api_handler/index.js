@@ -321,19 +321,12 @@ exports.handler = async (event) => {
             //     };
             // }
             const id = uuid.v4();
-
-
             const item = { ...reservationData, id };
-
-            // Set up PutCommand with the table name and item
-            const putParams = new PutCommand({
-                TableName: process.env.revtable,
+            const params = {
+                TableName: reservationsTable, // Make sure this is defined and correct
                 Item: item
-            });
-
-            // Execute the PutCommand
-            await dynamoDBDocumentClient.send(putParams);
-
+            };
+            await dynamoDB.put(params).promise();
             return {
                 statusCode: 200,
                 headers: { "Content-Type": "application/json" },
