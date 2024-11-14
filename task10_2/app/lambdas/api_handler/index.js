@@ -19,12 +19,12 @@ exports.handler = async (event) => {
 
     console.log(body);
     console.log(event);
-    
-    
+
+
     // Handle `/signup` endpoint
     if (event.resource === '/signup' && event.httpMethod === 'POST') {
         console.log('THIS IS SIMG UP');
-        
+
         const { email, password, firstName, lastName } = body;
         const params = {
             ClientId: clientId,
@@ -85,17 +85,18 @@ exports.handler = async (event) => {
         try {
             const data = await cognitoIdentityServiceProvider.adminInitiateAuth(params).promise();
             console.log(data);
-            
+
             return {
                 statusCode: 200,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ accessToken: data.AuthenticationResult.IdToken || 
-                'blank'
+                body: JSON.stringify({
+                    accessToken: data.AuthenticationResult.IdToken ||
+                        'blank'
                 })
             };
         } catch (error) {
             console.log(error);
-            
+
             return {
                 statusCode: 400,
                 headers: { "Content-Type": "application/json" },
@@ -127,10 +128,10 @@ exports.handler = async (event) => {
 
 
     if (event.resource === '/tables' && event.httpMethod === 'POST') {
-        try{
+        try {
             const params = {
                 TableName: tablesTable,
-                Item:body
+                Item: body
             };
             await dynamoDB.put(params).promise()
             return {
@@ -138,7 +139,7 @@ exports.handler = async (event) => {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id: body.id })
             };
-        }catch(e){
+        } catch (e) {
             console.log(e);
             return {
                 statusCode: 500,
@@ -146,9 +147,9 @@ exports.handler = async (event) => {
                 body: JSON.stringify({ message: "error" })
             };
         }
-        
+
     }
-    
+
 
     // Handle `/tables/{tableId}` resource for GET method
     if (event.resource === '/tables/{tableId}' && event.httpMethod === 'GET') {
@@ -163,7 +164,7 @@ exports.handler = async (event) => {
                 return {
                     statusCode: 200,
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ tableId: tableId, data: data.Item })
+                    body: JSON.stringify({ ...data.Item })
                 };
             } else {
                 return {
@@ -194,7 +195,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 200,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ reservations: data }) // Replace with actual data
+                body: JSON.stringify({ reservations: data.Items }) // Replace with actual data
             };
         } catch (e) {
             console.log(e);
@@ -208,36 +209,98 @@ exports.handler = async (event) => {
 
     }
 
+    async function isValidTableNumber(tableNumber) {
+        const params = {
+            TableName: tablesTable, // Your DynamoDB table with table details
+            Key: { tableNumber }
+        };
+
+        try {
+            const data = await dynamoDB.get(params).promise();
+            return data.Item !== undefined;
+        } catch (error) {
+            console.error("Error checking table existence:", error);
+            return false;
+        }
+    }
 
 
+    async function hasOverlappingReservation(reservationData) {
+        const params = {
+            TableName: reservationsTable,
+            FilterExpression: "tableNumber = :tableNumber AND #date = :date",
+            ExpressionAttributeNames: {
+                "#date": "date"
+            },
+            ExpressionAttributeValues: {
+                ":tableNumber": reservationData.tableNumber,
+                ":date": reservationData.date
+            }
+        };
+
+        const data = await dynamoDB.scan(params).promise();
+
+        for (const item of data.Items) {
+            const existingStart = new Date(`${item.date} ${item.slotTimeStart}`).getTime();
+            const existingEnd = new Date(`${item.date} ${item.slotTimeEnd}`).getTime();
+            const newStart = new Date(`${reservationData.date} ${reservationData.slotTimeStart}`).getTime();
+            const newEnd = new Date(`${reservationData.date} ${reservationData.slotTimeEnd}`).getTime();
+
+            // Check if the time slots overlap
+            if (newStart < existingEnd && newEnd > existingStart) {
+                return true; // Overlap detected
+            }
+        }
+
+        return false; // No overlap
+    }
 
     if (event.resource === '/reservations' && event.httpMethod === 'POST') {
         try {
             const reservationData = body;
-            const id = uuid.v4()
+            const id = uuid.v4();
+
+            // Validate tableNumber field in reservationData
+            const isValid = await isValidTableNumber(reservationData.tableNumber)
+            if (!reservationData.tableNumber || !isValid) {
+                return {
+                    statusCode: 400,
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: "Invalid table number" })
+                };
+            }
+            if (await hasOverlappingReservation(reservationData)) {
+                return {
+                    statusCode: 400,
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: "Reservation time overlaps with an existing reservation" })
+                };
+            }
+    
             const params = {
                 TableName: reservationsTable,
                 Item: {
-                    id:id,
+                    id: id,
                     ...reservationData
-                } // Assuming reservationData is an object with required attributes
+                }
             };
             await dynamoDB.put(params).promise();
+
             return {
                 statusCode: 200,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ reservationId:id })
+                body: JSON.stringify({ reservationId: id })
             };
         } catch (e) {
             console.log(e);
             return {
                 statusCode: 500,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: "Reservation created successfully" })
+                body: JSON.stringify({ message: "Error creating reservation" })
             };
         }
-
     }
+
 
     return {
         statusCode: 404,
