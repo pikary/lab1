@@ -240,18 +240,18 @@ exports.handler = async (event) => {
             const response = await dynamoDB
                 .query({
                     TableName: "cmtr-77278c6b-Tables-test",
+                    KeyConditionExpression: "#number = :tableNumberValue",
+                    FilterExpression: "#number = :tableNumberValue",
                     ExpressionAttributeNames: {
-                        "#tableNumber": `number`,
+                        "#number": "number", // Ensure "number" is the actual attribute name
                     },
                     ExpressionAttributeValues: {
-                        ":tableNumberValue": {
-                            "N": parsedTableNumber
-                        }
+                        ":tableNumberValue": parsedTableNumber
                     },
-                    KeyConditionExpression: "tableNumber = :tableNumberValue",
                 })
                 .promise();
-            return response.Items.length > 0 ? true : false;
+            return response.Items.length > 0;
+
         } catch (error) {
             console.error("Error checking table existence:", error);
             return false;
