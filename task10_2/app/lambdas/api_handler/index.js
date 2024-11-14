@@ -43,12 +43,12 @@ exports.handler = async (event) => {
         //         { Name: 'name', Value: firstName + lastName }
         //     ]
         // };
-        const confirmParams = {
-            Username: body.email,
-            UserPoolId: userPoolId
-        };
         try {
-            await cognitoIdentityServiceProvider.adminCreateUser(params).promise();
+            const data = await cognitoIdentityServiceProvider.signUp(params).promise();
+            const confirmParams = {
+                Username: body.email,
+                UserPoolId: userPoolId
+            };
             const confirmedResult = await cognitoIdentityServiceProvider.adminConfirmSignUp(confirmParams).promise();
 
             return {
