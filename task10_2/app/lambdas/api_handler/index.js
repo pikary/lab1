@@ -223,9 +223,10 @@ exports.handler = async (event) => {
             ExpressionAttributeValues: {
                 ":number":parseInt(tableNumber)
             },
+            FilterExpression: "number = :tableNumber",
             KeyConditionExpression: "number = :number",
             ProjectionExpression: "id, number, places",
-            TableName: "cmtr-77278c6b-Reservations-test",
+            TableName: "cmtr-77278c6b-Tables-test",
         };
     
         const data = await dynamoDB.scan(params).promise();
@@ -239,16 +240,17 @@ exports.handler = async (event) => {
         // };
         const parsedTableNumber = parseInt(tableNumber)
         const params = {
-            TableName: tablesTable,
+            TableName: 'cmtr-77278c6b-Tables-test',
             FilterExpression: "tableNumber = :tableNumber",
             ExpressionAttributeValues: {
                 ":tableNumber": parsedTableNumber
-            }
+            },
+            ProjectionExpression: "id, number, places",
         };
 
         try {
-            const data = await dynamoDB.get(params).promise();
-            return data.Item !== undefined;
+            const data = await dynamoDB.query(params).promise();
+            return data.Items.length > 0 ? false : true;
         } catch (error) {
             console.error("Error checking table existence:", error);
             return false;
@@ -293,7 +295,6 @@ exports.handler = async (event) => {
             // Validate tableNumber field in reservationData
             const isTableReserved = await isValidTableNumber(body.tableNumber)
             if (isTableReserved) {
-
                 return {
                     statusCode: 400,
                     headers: { "Content-Type": "application/json" },
