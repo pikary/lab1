@@ -216,9 +216,9 @@ exports.handler = async (event) => {
         // };
         const params = {
             TableName: tablesTable,
-            FilterExpression: "number = :number",
+            FilterExpression: "tableNumber = :tableNumber",
             ExpressionAttributeValues: {
-                ":number": tableNumber
+                ":tableNumber": tableNumber
             }
         };
     
@@ -268,21 +268,28 @@ exports.handler = async (event) => {
             const id = uuid.v4();
 
             // Validate tableNumber field in reservationData
-            const isValid = await isValidTableNumber(reservationData.tableNumber)
-            if (!reservationData.tableNumber || !isValid) {
+            const isTableReserved = await isValidTableNumber(reservationData.tableNumber)
+            if(isTableReserved){
                 return {
                     statusCode: 400,
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ message: "Invalid table number" })
                 };
             }
-            if (await hasOverlappingReservation(reservationData)) {
+            if (!reservationData.tableNumber) {
                 return {
                     statusCode: 400,
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: "Reservation time overlaps with an existing reservation" })
+                    body: JSON.stringify({ message: "Invalid table number" })
                 };
             }
+            // if (await hasOverlappingReservation(reservationData)) {
+            //     return {
+            //         statusCode: 400,
+            //         headers: { "Content-Type": "application/json" },
+            //         body: JSON.stringify({ message: "Reservation time overlaps with an existing reservation" })
+            //     };
+            // }
 
             const params = {
                 TableName: reservationsTable,
