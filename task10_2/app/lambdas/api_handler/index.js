@@ -29,7 +29,7 @@ exports.handler = async (event) => {
             Username: email,
             Password: password,
             UserAttributes: [{ Name: 'email', Value: email }],
-            MessageAction: "SUPPRESS", 
+            // MessageAction: "SUPPRESS", 
         };
 
         // const params = {
@@ -87,7 +87,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 200,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ accessToken: data.Session || 
+                body: JSON.stringify({ accessToken: data.AuthenticationResult.IdToken || 
                 'blank'
                 })
             };
