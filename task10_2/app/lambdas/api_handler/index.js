@@ -313,13 +313,13 @@ exports.handler = async (event) => {
                     body: JSON.stringify({ message: "NO TABLE DATA" })
                 };
             }
-            if (await hasOverlappingReservation(reservationData)) {
-                return {
-                    statusCode: 400,
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: "Reservation time overlaps with an existing reservation" })
-                };
-            }
+            // if (await hasOverlappingReservation(reservationData)) {
+            //     return {
+            //         statusCode: 400,
+            //         headers: { "Content-Type": "application/json" },
+            //         body: JSON.stringify({ message: "Reservation time overlaps with an existing reservation" })
+            //     };
+            // }
             const id = uuidv4();
             const params = {
                 TableName: 'cmtr-77278c6b-Reservations-test', 
