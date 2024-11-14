@@ -265,9 +265,7 @@ exports.handler = async (event) => {
                 .scan({
                     TableName: "cmtr-77278c6b-Reservations-test",
                     ExpressionAttributeValues: {
-                        ":tableNumberValue": {
-                            "N": parseInt(tableNumber)
-                        }
+                        ":tableNumberValue": parseInt(tableNumber)
                     },
                     FilterExpression: "tableNumber = :tableNumberValue",
                 })
@@ -286,7 +284,7 @@ exports.handler = async (event) => {
 
             return false; // No overlap
         } catch (e) {
-            console.log(e);
+            console.error(e);
 
             throw (e)
         }
