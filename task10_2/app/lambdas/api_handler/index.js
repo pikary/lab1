@@ -134,7 +134,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 200,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: "Table data added successfully" })
+                body: JSON.stringify({ id: body.id })
             };
         }catch(e){
             console.log(e);
