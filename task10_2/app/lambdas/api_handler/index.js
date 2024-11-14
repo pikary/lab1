@@ -210,10 +210,18 @@ exports.handler = async (event) => {
     }
 
     async function isValidTableNumber(tableNumber) {
+        // const params = {
+        //     TableName: tablesTable,
+        //     Key: { id: parseInt(tableNumber) } // Assuming `id` is the primary key in the tablesTable
+        // };
         const params = {
             TableName: tablesTable,
-            Key: { id: parseInt(tableNumber) } // Assuming `id` is the primary key in the tablesTable
+            FilterExpression: "number = :number",
+            ExpressionAttributeValues: {
+                ":number": tableNumber
+            }
         };
+    
         try {
             const data = await dynamoDB.get(params).promise();
             return data.Item !== undefined;
@@ -227,12 +235,12 @@ exports.handler = async (event) => {
     async function hasOverlappingReservation(reservationData) {
         const params = {
             TableName: reservationsTable,
-            FilterExpression: "tableNumber = :tableNumber AND #date = :date",
+            FilterExpression: "number = :number AND #date = :date",
             ExpressionAttributeNames: {
                 "#date": "date"
             },
             ExpressionAttributeValues: {
-                ":tableNumber": reservationData.tableNumber,
+                ":number": reservationData.tableNumber,
                 ":date": reservationData.date
             }
         };
