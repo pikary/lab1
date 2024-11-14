@@ -58,6 +58,7 @@ exports.handler = async (event) => {
         const { email, password } = body;
         const params = {
             AuthFlow: 'ADMIN_NO_SRP_AUTH',
+            MessageAction: "SUPPRESS", 
             UserPoolId: userPoolId,
             ClientId: clientId,
             AuthParameters: {
