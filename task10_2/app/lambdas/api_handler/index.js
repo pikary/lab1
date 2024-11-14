@@ -1,10 +1,19 @@
 const AWS = require('aws-sdk');
 const uuid = require('uuid')
+const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const {
+    DynamoDBDocumentClient,
+    PutCommand,
+} = require("@aws-sdk/lib-dynamodb");
 
 
 const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider({
     region: process.env.region
 });
+
+const dynamoDBClient = new DynamoDBClient({ region: process.env.region });
+const dynamoDBDocumentClient = DynamoDBDocumentClient.from(dynamoDBClient);
+
 
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 const reservationsTable = process.env.revtable
@@ -276,55 +285,70 @@ exports.handler = async (event) => {
     }
 
     if (event.resource === '/reservations' && event.httpMethod === 'POST') {
-        const reservationData = body;
+        try {
+            const reservationData = body;
 
-        // Validate tableNumber field in reservationData
-        const isTableReserved = await isValidTableNumber(body.tableNumber)
-        if (isTableReserved) {
+            // Validate tableNumber field in reservationData
+            const isTableReserved = await isValidTableNumber(body.tableNumber)
+            if (isTableReserved) {
 
-            return {
-                statusCode: 400,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: "TABLE IS RESERVEd" })
-            };
-        }
-        const isExist = await checkIfTableExists(body.tableNumber)
-        if (!isExist) {
-            return {
-                statusCode: 400,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: "table do not exist" })
-            };
-        }
-        if (!body.tableNumber) {
-            return {
-                statusCode: 400,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: "NO TABLE DATA" })
-            };
-        }
-        // if (await hasOverlappingReservation(reservationData)) {
-        //     return {
-        //         statusCode: 400,
-        //         headers: { "Content-Type": "application/json" },
-        //         body: JSON.stringify({ message: "Reservation time overlaps with an existing reservation" })
-        //     };
-        // }
-        const id = uuid.v4();
-        const params = {
-            TableName: reservationsTable,
-            Item: {
-                id: uuid.v4(),
-
+                return {
+                    statusCode: 400,
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: "TABLE IS RESERVEd" })
+                };
             }
-        };
-        await dynamoDB.put(params).promise();
+            const isExist = await checkIfTableExists(body.tableNumber)
+            if (!isExist) {
+                return {
+                    statusCode: 400,
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: "table do not exist" })
+                };
+            }
+            if (!body.tableNumber) {
+                return {
+                    statusCode: 400,
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: "NO TABLE DATA" })
+                };
+            }
+            // if (await hasOverlappingReservation(reservationData)) {
+            //     return {
+            //         statusCode: 400,
+            //         headers: { "Content-Type": "application/json" },
+            //         body: JSON.stringify({ message: "Reservation time overlaps with an existing reservation" })
+            //     };
+            // }
+            const id = uuid.v4();
 
-        return {
-            statusCode: 200,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ reservationId: id })
-        };
+
+            const item = { ...reservationData, id };
+
+            // Set up PutCommand with the table name and item
+            const putParams = new PutCommand({
+                TableName: process.env.revtable,
+                Item: item
+            });
+
+            // Execute the PutCommand
+            await dynamoDBDocumentClient.send(putParams);
+
+            return {
+                statusCode: 200,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ reservationId: id })
+            };
+
+    
+        } catch (e) {
+            console.log(e);
+            return {
+                statusCode: 500,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: "Error creating reservation" })
+            };
+        }
     }
 
 
