@@ -1,5 +1,5 @@
 const moment = require('moment')
-const WeatherAPI = require('nurlan')
+const WeatherAPI = require('your-layer-name')
 
 exports.handler = async (event) => {
     try {
