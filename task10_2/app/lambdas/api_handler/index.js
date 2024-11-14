@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk');
-const uuid = require('uuid')
+const { v4: uuidv4 } = require('uuid');
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const {
     DynamoDBDocumentClient,
@@ -320,11 +320,10 @@ exports.handler = async (event) => {
             //         body: JSON.stringify({ message: "Reservation time overlaps with an existing reservation" })
             //     };
             // }
-            const id = uuid.v4();
-            const item = { ...reservationData, id };
+            const id = uuidv4();
             const params = {
-                TableName: reservationsTable, // Make sure this is defined and correct
-                Item: item
+                TableName: reservationsTable, 
+                Item: { ...body, id }
             };
             await dynamoDB.put(params).promise();
             return {
