@@ -323,7 +323,9 @@ exports.handler = async (event) => {
             const id = uuidv4();
             const params = {
                 TableName: reservationsTable, 
-                Item: { ...body, id }
+                Item: {
+                    "id": id,
+                }
             };
             await dynamoDB.put(params).promise();
             return {
