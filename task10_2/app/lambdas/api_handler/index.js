@@ -221,11 +221,11 @@ exports.handler = async (event) => {
     async function checkIfTableExists(tableNumber) {
         var params = {
             ExpressionAttributeValues: {
-                ":number":parseInt(tableNumber)
+                ":tableNumber":parseInt(tableNumber)
             },
             FilterExpression: "number = :tableNumber",
             KeyConditionExpression: "number = :number",
-            ProjectionExpression: "id, number, places",
+            ProjectionExpression: "id, places",
             TableName: "cmtr-77278c6b-Tables-test",
         };
     
@@ -245,7 +245,7 @@ exports.handler = async (event) => {
             ExpressionAttributeValues: {
                 ":tableNumber": parsedTableNumber
             },
-            ProjectionExpression: "id, number, places",
+            ProjectionExpression: "id, places",
         };
 
         try {
