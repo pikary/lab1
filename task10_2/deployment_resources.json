@@ -149,6 +149,16 @@
     },
     "tags": {}
   },
+  "${reservations_table}": {
+    "resource_type": "dynamodb_table",
+    "hash_key_name": "id",
+    "hash_key_type": "S",
+    "read_capacity": 1,
+    "write_capacity": 1,
+    "global_indexes": [],
+    "autoscaling": [],
+    "tags": {}
+  },
   "${tables_table}": {
     "resource_type": "dynamodb_table",
     "hash_key_name": "id",
@@ -159,16 +169,7 @@
     "autoscaling": [],
     "tags": {}
   },
-  "${reservations_table}": {
-    "resource_type": "dynamodb_table",
-    "hash_key_name": "reservationId",
-    "hash_key_type": "S", 
-    "read_capacity": 1,
-    "write_capacity": 1,
-    "global_indexes": [],
-    "autoscaling": [],
-    "tags": {}
-  },
+ 
   "${booking_userpool}": {
     "resource_type": "cognito_idp",
     "password_policy": {
@@ -194,4 +195,5 @@
     },
     "tags": {}
   }
+
 }

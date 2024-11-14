@@ -15,8 +15,17 @@
     {
       "resource_name": "${booking_userpool}",
       "resource_type": "cognito_idp"
+    },
+    {
+      "resource_name":"${tables_table}",
+      "resource_type":"dynamodb_table"
+    },
+    {
+      "resource_name":"${reservations_table}",
+      "resource_type":"dynamodb_table"
     }
   ],
+ 
   "env_variables": {
     "CUPId": {
       "resource_name": "${booking_userpool}",
