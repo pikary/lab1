@@ -224,7 +224,7 @@ exports.handler = async (event) => {
                 ":tableNumber":parseInt(tableNumber)
             },
             FilterExpression: "number = :tableNumber",
-            KeyConditionExpression: "number = :number",
+            KeyConditionExpression: "number = :tableNumber",
             ProjectionExpression: "id, places",
             TableName: "cmtr-77278c6b-Tables-test",
         };
@@ -261,12 +261,12 @@ exports.handler = async (event) => {
     async function hasOverlappingReservation(reservationData) {
         const params = {
             TableName: 'cmtr-77278c6b-Reservations-test',
-            FilterExpression: "number = :number AND #date = :date",
+            FilterExpression: "number = :tableNumber AND #date = :date",
             ExpressionAttributeNames: {
                 "#date": "date"
             },
             ExpressionAttributeValues: {
-                ":number": reservationData.tableNumber,
+                ":tableNumber": reservationData.tableNumber,
                 ":date": reservationData.date
             }
         };
