@@ -261,8 +261,8 @@ exports.handler = async (event) => {
             const id = uuid.v4();
 
             // Validate tableNumber field in reservationData
-            const isValid = await isValidTableNumber(reservationData.tableNumber)
-            if (!reservationData.tableNumber || !isValid) {
+            // const isValid = await isValidTableNumber(reservationData.tableNumber)
+            if (!reservationData.tableNumber) {
                 return {
                     statusCode: 400,
                     headers: { "Content-Type": "application/json" },
