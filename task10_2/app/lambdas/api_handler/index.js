@@ -214,11 +214,12 @@ exports.handler = async (event) => {
         //     TableName: tablesTable,
         //     Key: { id: parseInt(tableNumber) } // Assuming `id` is the primary key in the tablesTable
         // };
+        const parsedTableNumber = parseInt(tableNumber)
         const params = {
             TableName: tablesTable,
             FilterExpression: "tableNumber = :tableNumber",
             ExpressionAttributeValues: {
-                ":tableNumber": tableNumber
+                ":tableNumber": parsedTableNumber
             }
         };
     
