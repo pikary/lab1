@@ -315,10 +315,8 @@ exports.handler = async (event) => {
 
             const params = {
                 TableName: reservationsTable,
-                Item: {
-                    Key: { id: id },
-                    ...reservationData
-                }
+                Item:{ ...reservationData, id: id }
+
             };
             await dynamoDB.put(params).promise();
 
