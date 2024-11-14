@@ -13,23 +13,22 @@ exports.handler = async (event) => {
     const clientId = process.env.CUPClientId;
 
     // Parse the request body
-    let body;
-    try {
-        body = JSON.parse(event.body);
-    } catch (error) {
-        return {
-            statusCode: 400,
-            body: JSON.stringify({ error: "Invalid request body" })
-        };
-    }
+    let body = JSON.parse(event.body)
 
+    console.log(body);
+    console.log(event);
+    
+    
     // Handle `/signup` endpoint
     if (event.resource === '/signup' && event.httpMethod === 'POST') {
+        console.log('THIS IS SIMG UP');
+        
         const { email, password, firstName, lastName } = body;
         const params = {
             UserPoolId: userPoolId,
             Username: email,
             TemporaryPassword: password,
+            MessageAction: "SUPPRESS", 
             UserAttributes: [
                 { Name: 'email', Value: email },
                 { Name: 'name', Value: firstName + lastName }

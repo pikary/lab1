@@ -74,7 +74,7 @@
           "responses": [],
           "integration_responses": [],
           "default_error_pattern": true,
-          "enable_proxy": false
+          "enable_proxy": true
         }
       },
       "/tables": {
