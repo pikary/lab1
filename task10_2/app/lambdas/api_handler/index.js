@@ -236,18 +236,19 @@ exports.handler = async (event) => {
     async function isTableExist(tableNumber) {
         const parsedTableNumber = parseInt(tableNumber)
         //we check if table exists here
-
         try {
             const response = await dynamoDB
                 .query({
                     TableName: "cmtr-77278c6b-Tables-test",
                     ExpressionAttributeNames: {
-                        "#tableNumber": `${parseInt(tableNumber)}`,
+                        "#tableNumber": `number`,
                     },
                     ExpressionAttributeValues: {
-                        ":tableNumberValue": "tableNumber"
+                        ":tableNumberValue": {
+                            "N": parsedTableNumber
+                        }
                     },
-                    FilterExpression: "#number = :tableNumberValue",
+                    FilterExpression: "#tableNumber = :tableNumberValue",
                 })
                 .promise();
             return response.Items.length > 0 ? true : false;
@@ -264,13 +265,12 @@ exports.handler = async (event) => {
             const response = await dynamoDB
                 .query({
                     TableName: "cmtr-77278c6b-Reservations-test",
-                    ExpressionAttributeNames: {
-                        "#tableNumber": `${parseInt(tableNumber)}`,
-                    },
                     ExpressionAttributeValues: {
-                        ":tableNumberValue": "tableNumber"
+                        ":tableNumberValue": {
+                            "N": parseInt(tableNumber)
+                        }
                     },
-                    FilterExpression: "#tableNumber = :tableNumberValue",
+                    FilterExpression: "tableNumber = :tableNumberValue",
                 })
                 .promise();
             for (const item of response.Items) {
@@ -288,8 +288,8 @@ exports.handler = async (event) => {
             return false; // No overlap
         } catch (e) {
             console.log(e);
-            
-            throw(e)
+
+            throw (e)
         }
 
     }
