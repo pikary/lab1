@@ -238,9 +238,8 @@ exports.handler = async (event) => {
         //we check if table exists here
         try {
             const response = await dynamoDB
-                .query({
+                .scan({
                     TableName: "cmtr-77278c6b-Tables-test",
-                    KeyConditionExpression: "#number = :tableNumberValue",
                     FilterExpression: "#number = :tableNumberValue",
                     ExpressionAttributeNames: {
                         "#number": "number", // Ensure "number" is the actual attribute name
@@ -263,14 +262,14 @@ exports.handler = async (event) => {
         try {
             const tableNumber = reservationData.tableNumber
             const response = await dynamoDB
-                .query({
+                .scan({
                     TableName: "cmtr-77278c6b-Reservations-test",
                     ExpressionAttributeValues: {
                         ":tableNumberValue": {
                             "N": parseInt(tableNumber)
                         }
                     },
-                    KeyConditionExpression: "tableNumber = :tableNumberValue",
+                    FilterExpression: "tableNumber = :tableNumberValue",
                 })
                 .promise();
             for (const item of response.Items) {
