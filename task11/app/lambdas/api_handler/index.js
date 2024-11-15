@@ -7,7 +7,7 @@ const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider({
 });
 
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
-const reservationsTable = 'cmtr-77278c6b-Reservations-test'
+const reservationsTable = process.env.revtable
 const tablesTable = process.env.tablestable
 
 
@@ -56,11 +56,7 @@ exports.handler = async (event) => {
             };
             await cognitoIdentityServiceProvider.adminConfirmSignUp(confirmParams).promise();
 
-            return {
-                statusCode: 200,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: "User created successfully" })
-            };
+            return apiResponse(200, {message:"User created successfully"})
         } catch (error) {
             console.log(error);
 

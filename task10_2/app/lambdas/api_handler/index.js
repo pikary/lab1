@@ -1,23 +1,29 @@
 const AWS = require('aws-sdk');
 const { v4: uuidv4 } = require('uuid');
-const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const {
-    DynamoDBDocumentClient,
-    PutCommand,
-} = require("@aws-sdk/lib-dynamodb");
 
 
 const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider({
     region: process.env.region
 });
 
-const dynamoDBClient = new DynamoDBClient({ region: 'eu-central-1' });
-const dynamoDBDocumentClient = DynamoDBDocumentClient.from(dynamoDBClient);
-
-
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
-const reservationsTable = 'cmtr-77278c6b-Reservations-test'
+const reservationsTable = process.env.revtable
 const tablesTable = process.env.tablestable
+
+
+
+function apiResponse(statusCode, body) {
+    return {
+        statusCode: statusCode,
+        headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*", // Or your specific domain
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization"
+        },
+        body: JSON.stringify(body)
+    }
+}
 
 exports.handler = async (event) => {
     const userPoolId = process.env.CUPId;
@@ -42,39 +48,20 @@ exports.handler = async (event) => {
             UserAttributes: [{ Name: 'email', Value: email }],
             // MessageAction: "SUPPRESS", 
         };
-
-        // const params = {
-        //     ClientId:clientId,
-        //     UserPoolId: userPoolId,
-        //     Username: email,
-        //     Password: password,
-        //     MessageAction: "SUPPRESS", 
-        //     UserAttributes: [
-        //         { Name: 'email', Value: email },
-        //         { Name: 'name', Value: firstName + lastName }
-        //     ]
-        // };
         try {
-            const data = await cognitoIdentityServiceProvider.signUp(params).promise();
+            await cognitoIdentityServiceProvider.signUp(params).promise();
             const confirmParams = {
                 Username: body.email,
                 UserPoolId: userPoolId
             };
-            const confirmedResult = await cognitoIdentityServiceProvider.adminConfirmSignUp(confirmParams).promise();
+            await cognitoIdentityServiceProvider.adminConfirmSignUp(confirmParams).promise();
 
-            return {
-                statusCode: 200,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: "User created successfully" })
-            };
+            return apiResponse(200, {message:"User created successfully"})
         } catch (error) {
             console.log(error);
 
-            return {
-                statusCode: 400,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ error: "Signup failed", details: error.message })
-            };
+            return apiResponse(400, { error: "Signup failed", details: error.message })
+
         }
     }
 
@@ -94,23 +81,11 @@ exports.handler = async (event) => {
         try {
             const data = await cognitoIdentityServiceProvider.adminInitiateAuth(params).promise();
             console.log(data);
+            return apiResponse(200, { accessToken: data.AuthenticationResult.IdToken || 'blank' })
 
-            return {
-                statusCode: 200,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    accessToken: data.AuthenticationResult.IdToken ||
-                        'blank'
-                })
-            };
         } catch (error) {
             console.log(error);
-
-            return {
-                statusCode: 400,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ error: "Authentication failed", details: error })
-            };
+            return apiResponse(400, { error: "Authentication failed", details: error })
         }
     }
 
@@ -120,18 +95,10 @@ exports.handler = async (event) => {
         };
         try {
             const data = await dynamoDB.scan(params).promise();
-            return {
-                statusCode: 200,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ tables: data.Items }) // Returns all tables
-            };
+            return apiResponse(200, { tables: data.Items })
         } catch (error) {
             console.error(error);
-            return {
-                statusCode: 500,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ error: "Failed to fetch tables", details: error.message })
-            };
+            return apiResponse(500, { error: "Failed to fetch tables", details: error.message })
         }
     }
 
@@ -143,18 +110,12 @@ exports.handler = async (event) => {
                 Item: body
             };
             await dynamoDB.put(params).promise()
-            return {
-                statusCode: 200,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id: body.id })
-            };
+            return apiResponse(200, { id: body.id })
+
+
         } catch (e) {
             console.log(e);
-            return {
-                statusCode: 500,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: "error" })
-            };
+            return apiResponse(500, { message: "error" })
         }
 
     }
@@ -170,25 +131,13 @@ exports.handler = async (event) => {
         try {
             const data = await dynamoDB.get(params).promise();
             if (data.Item) {
-                return {
-                    statusCode: 200,
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ ...data.Item })
-                };
+                return apiResponse(200, { ...data.Item })
             } else {
-                return {
-                    statusCode: 404,
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ error: "Table not found" })
-                };
+                return apiResponse(404, { error: "Table not found" })
             }
         } catch (error) {
             console.error(error);
-            return {
-                statusCode: 500,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ error: "Failed to fetch table data", details: error.message })
-            };
+            return apiResponse(500, { error: "Failed to fetch table data", details: error.message })
         }
     }
 
@@ -201,21 +150,11 @@ exports.handler = async (event) => {
         try {
             const params = { TableName: reservationsTable }
             const data = await dynamoDB.scan(params).promise()
-            return {
-                statusCode: 200,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ reservations: data.Items }) // Replace with actual data
-            };
+            return apiResponse(200, { reservations: data.Items })
         } catch (e) {
             console.log(e);
-
-            return {
-                statusCode: 500,
-                headers: { "Content-Type": "application/json" },
-                body: e.message
-            }
+            return apiResponse(500, e.message)
         }
-
     }
 
     async function checkIfTableExists(tableNumber) {
@@ -226,7 +165,7 @@ exports.handler = async (event) => {
             FilterExpression: "number = :tableNumber",
             KeyConditionExpression: "number = :tableNumber",
             ProjectionExpression: "id, places",
-            TableName: "cmtr-77278c6b-Tables-test",
+            TableName: tablesTable,
         };
 
         const data = await dynamoDB.scan(params).promise();
@@ -239,7 +178,7 @@ exports.handler = async (event) => {
         try {
             const response = await dynamoDB
                 .scan({
-                    TableName: "cmtr-77278c6b-Tables-test",
+                    TableName: tablesTable,
                     FilterExpression: "#number = :tableNumberValue",
                     ExpressionAttributeNames: {
                         "#number": "number", // Ensure "number" is the actual attribute name
@@ -263,7 +202,7 @@ exports.handler = async (event) => {
             const tableNumber = reservationData.tableNumber
             const response = await dynamoDB
                 .scan({
-                    TableName: "cmtr-77278c6b-Reservations-test",
+                    TableName: reservationsTable,
                     ExpressionAttributeValues: {
                         ":tableNumberValue": parseInt(tableNumber)
                     },
@@ -299,26 +238,18 @@ exports.handler = async (event) => {
             const tableExistence = await isTableExist(body.tableNumber)
             if (!tableExistence) {
                 console.log('table do not exist');
-                return {
-                    statusCode: 400,
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: "table do not exist" })
-                }
+                return apiResponse(400, { message: "table do not exist" })
             }
             // identify if new reservation overlaping older
             const isOverlaping = await hasOverlappingReservation(body)
             if (isOverlaping) {
                 console.log('You are overlapping reservation. Cancel');
-                return {
-                    statusCode: 400,
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: "You are overlapping reservation. Cancel" })
-                }
+                return apiResponse(400, { message: "You are overlapping reservation. Cancel" })
             }
 
             const id = uuidv4();
             const params = {
-                TableName: 'cmtr-77278c6b-Reservations-test',
+                TableName: reservationsTable,
                 Item: {
                     "id": id,
                     "tableNumber": body.tableNumber,
@@ -330,18 +261,10 @@ exports.handler = async (event) => {
                 }
             };
             await dynamoDB.put(params).promise();
-            return {
-                statusCode: 200,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ reservationId: id })
-            };
+            return apiResponse(200, { reservationId: id })
         } catch (e) {
             console.log(e);
-            return {
-                statusCode: 500,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: e.message })
-            };
+            return apiResponse(500, { message: e.message })
         }
     }
 
