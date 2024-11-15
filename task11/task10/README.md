@@ -1,4 +1,4 @@
-# task10_2
+# task10
 
 High level project overview - business value it brings, non-detailed technical overview.
 
@@ -7,9 +7,9 @@ All the technical details described below are actual for the particular
 version, or a range of versions of the software.
 ### Actual for versions: 1.0.0
 
-## task10_2 diagram
+## task10 diagram
 
-![task10_2](pics/task10_2_diagram.png)
+![task10](pics/task10_diagram.png)
 
 ## Lambdas descriptions
 

@@ -18,10 +18,9 @@ function apiResponse(statusCode, body, headers) {
         headers: headers ||
         {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*", 
-            "Access-Control-Allow-Methods": "*",
-            "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-            "Accept-Version":"*"
+            "Access-Control-Allow-Origin": "*", // Or your specific domain
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization"
         },
         body: JSON.stringify(body)
     }

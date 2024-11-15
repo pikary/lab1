@@ -9,17 +9,22 @@
   "timeout": 100,
   "lambda_path": "lambdas\\api_handler",
   "event_sources": [],
+  "publish_version": true,
+  "alias": "${lambdas_alias_name}",
   "dependencies": [
     {
       "resource_name": "${booking_userpool}",
       "resource_type": "cognito_idp"
+    },
+    {
+      "resource_name": "${tables_table}",
+      "resource_type": "dynamodb_table"
+    },
+    {
+      "resource_name": "${reservations_table}",
+      "resource_type": "dynamodb_table"
     }
   ],
-  "publish_version": true,
-  "alias": "${lambdas_alias_name}",
-  "url_config": {},
-  "ephemeral_storage": 512,
-  "tags": {},
   "env_variables": {
     "CUPId": {
       "resource_name": "${booking_userpool}",
@@ -31,6 +36,27 @@
       "resource_type": "cognito_idp",
       "parameter": "client_id"
     },
-    "region":"${region}"
-  }
+    "tablestable": "${tables_table}",
+    "revtable": "${reservations_table}"
+  },
+  "url_config": {
+    "auth_type": "NONE",
+    "cors": {
+      "allow_credentials": true,
+      "allow_headers": [
+        "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token"
+      ],
+      "allow_methods": [
+        "*"
+      ],
+      "allow_origins": [
+        "*"
+      ],
+      "expose_headers": [
+        "*"
+      ]
+    }
+  },
+  "ephemeral_storage": 512,
+  "tags": {}
 }
