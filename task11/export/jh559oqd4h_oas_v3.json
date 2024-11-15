@@ -513,7 +513,9 @@
         "x-amazon-apigateway-authtype": "cognito_user_pools",
         "x-amazon-apigateway-authorizer": {
           "type": "cognito_user_pools",
-          "x-syndicate-cognito-userpool-names": ["${booking_userpool}"]
+          "providerARNs": [
+            "arn:aws:cognito-idp:eu-central-1:196241772369:userpool/eu-central-1_9g3CjKz8x"
+          ]
         }
       }
     }
