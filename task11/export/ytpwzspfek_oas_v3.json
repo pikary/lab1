@@ -2,11 +2,12 @@
   "openapi": "3.0.1",
   "info": {
     "title": "task11_api",
-    "version": "2024-11-18T09:46:37Z"
+    "version": "2024-11-15T12:14:44Z",
+    "description": "task11_api"
   },
   "servers": [
     {
-      "url": "https://ytpwzspfek.execute-api.eu-central-1.amazonaws.com/{basePath}",
+      "url": "https://fnsrpok6c7.execute-api.eu-central-1.amazonaws.com/{basePath}",
       "variables": {
         "basePath": {
           "default": "api"
@@ -17,8 +18,8 @@
   "paths": {
     "/reservations": {
       "get": {
-        "summary": "getting all reservations",
-        "description": "getting all reservations",
+        "summary": "Getting all brones",
+        "description": "get info about reservation",
         "responses": {
           "200": {
             "description": "200 response",
@@ -36,14 +37,15 @@
                   "properties": {
                     "reservations": {
                       "type": "array",
-                      "items": {
-                        "type": "object"
-                      }
+                      "items": { "type": "object" }
                     }
                   }
                 }
               }
             }
+          },
+          "400": {
+            "description": "Error"
           }
         },
         "security": [
@@ -67,8 +69,8 @@
         }
       },
       "post": {
-        "summary": "New reservation",
-        "description": "Book a reservation",
+        "summary": "New brone",
+        "description":  "Do new reservations",
         "requestBody": {
           "required": true,
           "content": {
@@ -76,36 +78,14 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "tableNumber": {
-                    "type": "integer"
-                  },
-                  "clientName": {
-                    "type": "string"
-                  },
-                  "phoneNumber": {
-                    "type": "string"
-                  },
-                  "date": {
-                    "type": "string",
-                    "format": "date"
-                  },
-                  "slotTimeStart": {
-                    "type": "string",
-                    "format": "time"
-                  },
-                  "slotTimeEnd": {
-                    "type": "string",
-                    "format": "time"
-                  }
+                  "tableNumber": { "type": "integer" },
+                  "clientName": { "type": "string" },
+                  "phoneNumber": { "type": "string" },
+                  "date": { "type": "string", "format": "date" },
+                  "slotTimeStart": { "type": "string", "format": "time" },
+                  "slotTimeEnd": { "type": "string", "format": "time" }
                 },
-                "required": [
-                  "tableNumber",
-                  "clientName",
-                  "phoneNumber",
-                  "date",
-                  "slotTimeStart",
-                  "slotTimeEnd"
-                ]
+                "required": ["tableNumber", "clientName", "phoneNumber", "date", "slotTimeStart", "slotTimeEnd"]
               }
             }
           }
@@ -116,7 +96,10 @@
             "headers": {
               "Access-Control-Allow-Origin": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "reservationId": { "type": "string" }
+                  }
                 }
               }
             },
@@ -125,13 +108,14 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "reservationId": {
-                      "type": "string"
-                    }
+                    "reservationId": { "type": "string" }
                   }
                 }
               }
             }
+          },
+          "400": {
+            "description": "Error"
           }
         },
         "security": [
@@ -206,7 +190,7 @@
     "/tables": {
       "get": {
         "summary": "get all tables",
-        "description": "get",
+        "description": "get all tables",
         "responses": {
           "200": {
             "description": "200 response",
@@ -221,12 +205,13 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": {
-                    "type": "object"
-                  }
+                  "items": { "type": "object" }
                 }
               }
             }
+          },
+          "400": {
+            "description": "error"
           }
         },
         "security": [
@@ -250,8 +235,8 @@
         }
       },
       "post": {
-        "summary": "create new table",
-        "description": "post",
+        "summary": "add table",
+        "description": "This method allows the user to add a new table",
         "requestBody": {
           "required": true,
           "content": {
@@ -259,28 +244,13 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "id": {
-                    "type": "integer"
-                  },
-                  "number": {
-                    "type": "integer"
-                  },
-                  "places": {
-                    "type": "integer"
-                  },
-                  "isVip": {
-                    "type": "boolean"
-                  },
-                  "minOrder": {
-                    "type": "integer"
-                  }
+                  "id": { "type": "integer" },
+                  "number": { "type": "integer" },
+                  "places": { "type": "integer" },
+                  "isVip": { "type": "boolean" },
+                  "minOrder": { "type": "integer" }
                 },
-                "required": [
-                  "id",
-                  "number",
-                  "places",
-                  "isVip"
-                ]
+                "required": ["id", "number", "places", "isVip"]
               }
             }
           }
@@ -295,18 +265,20 @@
                 }
               }
             },
+            
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "id": {
-                      "type": "integer"
-                    }
+                    "id": { "type": "integer" }
                   }
                 }
               }
             }
+          },
+          "400": {
+            "description": "error"
           }
         },
         "security": [
@@ -380,8 +352,8 @@
     },
     "/signin": {
       "post": {
-        "summary": "Login o website booking",
-        "description": "signin",
+        "summary": "sign-in",
+        "description": "login in system",
         "requestBody": {
           "required": true,
           "content": {
@@ -389,19 +361,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "email": {
-                    "type": "string",
-                    "format": "email"
-                  },
-                  "password": {
-                    "type": "string",
-                    "format": "password"
-                  }
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "format": "password" }
                 },
-                "required": [
-                  "email",
-                  "password"
-                ]
+                "required": ["email", "password"]
               }
             }
           }
@@ -421,13 +384,15 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "accessToken": {
-                      "type": "string"
-                    }
+                    "accessToken": { "type": "string" }
                   }
                 }
               }
             }
+          },
+          "400": {
+            "description": "auth error"
+
           }
         },
         "x-amazon-apigateway-integration": {
@@ -494,70 +459,10 @@
         }
       }
     },
-    "/signup": {
-      "post": {
-        "summary": "register to webite",
-        "description": "registration",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "firstName": {
-                    "type": "string"
-                  },
-                  "lastName": {
-                    "type": "string"
-                  },
-                  "email": {
-                    "type": "string",
-                    "format": "email"
-                  },
-                  "password": {
-                    "type": "string",
-                    "format": "password"
-                  }
-                },
-                "required": [
-                  "email",
-                  "password",
-                  "firstName",
-                  "lastName"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "200 response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "description": "User Created!"
-                }
-              }
-            }
-          }
-        },
-        "x-amazon-apigateway-integration": {
-          "httpMethod": "POST",
-          "uri": "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:196241772369:function:api_handler/invocations",
-          "responses": {
-            "default": {
-              "statusCode": "200"
-            }
-          },
-          "passthroughBehavior": "when_no_match",
-          "type": "mock"
-        }
-      }
-    },
     "/tables/{tableId}": {
       "get": {
+        "summary": "get table by id",
+        "description": "getting information about specifyed table",
         "parameters": [
           {
             "name": "tableId",
@@ -665,6 +570,113 @@
           "type": "mock"
         }
       }
+    },
+    "/signup": {
+      "post": {
+        "summary": "registration",
+        "description": "registration new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "firstName": { "type": "string" },
+                  "lastName": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "format": "password" }
+                },
+                "required": ["email", "password", "firstName", "lastName"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "OK"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "error"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:196241772369:function:api_handler/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      },
+      "options": {
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Empty"
+                }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Methods": "'*'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "requestTemplates": {
+            "application/json": "{\"statusCode\": 200}"
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "mock"
+        }
+      }
     }
   },
   "components": {
@@ -681,9 +693,7 @@
         "in": "header",
         "x-amazon-apigateway-authtype": "cognito_user_pools",
         "x-amazon-apigateway-authorizer": {
-          "x-syndicate-cognito-userpool-names": [
-            "${booking_userpool}"
-          ],
+          "x-syndicate-cognito-userpool-names": ["${booking_userpool}"],
           "type": "cognito_user_pools"
         }
       }

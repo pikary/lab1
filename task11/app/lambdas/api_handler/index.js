@@ -38,9 +38,12 @@ exports.handler = async (event) => {
 
     // Handle `/signup` endpoint
     if (event.resource === '/signup' && event.httpMethod === 'POST') {
-        console.log('THIS IS SIMG UP');
 
         const { email, password, firstName, lastName } = body;
+        if(!email || !password || !firstName || !lastName){
+            return apiResponse(400, {message:"Bad Request"})
+        }
+
         const params = {
             ClientId: clientId,
             Username: email,
@@ -68,6 +71,9 @@ exports.handler = async (event) => {
     // Handle `/signin` endpoint
     if (event.resource === '/signin' && event.httpMethod === 'POST') {
         const { email, password } = body;
+        if(!email || !password){
+            return apiResponse(400, {message:"Bad Request"})
+        }
         const params = {
             AuthFlow: 'ADMIN_NO_SRP_AUTH',
             UserPoolId: userPoolId,
