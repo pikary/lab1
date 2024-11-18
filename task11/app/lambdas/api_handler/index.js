@@ -56,7 +56,7 @@ exports.handler = async (event) => {
             };
             await cognitoIdentityServiceProvider.adminConfirmSignUp(confirmParams).promise();
 
-            return apiResponse(200, {message:"User created successfully"})
+            return apiResponse(200, { message: "User created successfully" })
         } catch (error) {
             console.log(error);
 
