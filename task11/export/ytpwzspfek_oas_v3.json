@@ -552,7 +552,7 @@
             }
           },
           "passthroughBehavior": "when_no_match",
-          "type": "aws_proxy"
+          "type": "mock"
         }
       }
     },
